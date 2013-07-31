@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.uniluebeck.itm.dynamixsspbridge"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="17" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="de.uniluebeck.itm.dynamixsspbridge.ui.SubscriptionView"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView"></activity>
+        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextSubscriptionRequested"></activity>
+       <service android:name="de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService"></service>
+       <service android:name="de.uniluebeck.itm.coapserver.CoapServerManager"></service>
+       <service android:name="de.uniluebeck.itm.htmlserver.HTMLServerManager"></service>
+       <service android:name="de.uniluebeck.itm.dynamixsspbridge.support.NotificationService"></service>
+       <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartService"></service>
+        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager"></service>
+       	<receiver android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartUp">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+        </intent-filter>
+    	</receiver>
+    </application>
+
+</manifest>

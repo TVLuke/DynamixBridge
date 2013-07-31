@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".Activity"
+    android:orientation="vertical"  >
+
+   <TextView
+        android:id="@+id/adresstext"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="@string/address" />
+        
+    <TextView
+        android:id="@+id/coapip"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:text="@string/update" />
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    </ListView>
+
+</LinearLayout>

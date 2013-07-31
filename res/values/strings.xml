@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DynamixBrigde</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="update">Update</string>
+    <string name="submitToSSP">Submit To SSP</string>
+    <string name="description">Description</string>
+    <string name="subscribetoplugins">Subscribe To Plug Ins</string>
+    <string name="updateintervall">Update OIntervall (in seconds)</string>
+    <string name="youhavereceived">You have been requested to subscribe to this context and submit data into the internet of things.</string>
+    <string name="address">Address:</string>
+
+</resources>
