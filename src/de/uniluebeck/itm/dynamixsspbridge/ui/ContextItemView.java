@@ -78,7 +78,7 @@ public class ContextItemView extends Activity
 		if(contextType.active())
         {
         	TextView url = (TextView) findViewById(R.id.ipandport);
-        	url.setText("coap://"+Utils.getIPAddress(true)+":"+"XXXX"+"/"+name.replace(".", "/"));
+        	url.setText("coap://"+Utils.getIPAddress(true)+":"+"5683"+"/"+name.replace(".", "/"));
        		ImageView image = (ImageView) findViewById(R.id.imageView1);
        		image.setImageResource(R.drawable.active);
         }
