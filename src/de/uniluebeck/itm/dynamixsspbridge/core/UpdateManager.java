@@ -16,13 +16,19 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.core;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ambientdynamix.api.application.ContextEvent;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.Utils;
@@ -49,6 +55,7 @@ public class UpdateManager extends IntentService
 	private static boolean useIPv4=true;
 	private static boolean run=true;
 	private static int countdowntorestart=1;
+	private static int littlecounter = 0;
 	
 	private static ConcurrentHashMap<String, ContextType> contexttypes = new ConcurrentHashMap<String, ContextType>();
 	
@@ -182,6 +189,24 @@ public class UpdateManager extends IntentService
 		{
 			Log.i(TAG, "dynamix is not connected");
 		}
+		new Thread(new Runnable() 
+        {
+            public void run() 
+            {
+        		//TODO: Update descriptions of context and stuff...
+            	Iterator<String> itx = contexttypes.keySet().iterator();
+            	while(itx.hasNext())
+            	{
+            		ContextType ct = contexttypes.get(itx.next());
+            		if(ct.getDescription().equals("") || littlecounter==60)
+            		{
+            			//now, download the description and probably some other stuff from the thing
+            			updateDetail(ct);
+            		}
+            		littlecounter++;
+            	}
+            }
+        }).start();
 		scheduleNext();
 	}
 	
@@ -264,4 +289,82 @@ public class UpdateManager extends IntentService
 	{
 		return null;
 	}
+	
+	private void updateDetail(ContextType ct)
+	{
+		Log.d(TAG, ct.getName());
+		final SAXBuilder builder = new SAXBuilder();
+		try 
+		{
+			Document doc = builder.build("https://raw.github.com/TVLuke/DynamixRepository/master/context.xml");
+			Element root = doc.getRootElement();
+			List<Element> children = root.getChildren();
+			Iterator<Element> childrenIterator = children.iterator();
+			while(childrenIterator.hasNext())
+            {
+				Element child = childrenIterator.next(); 
+                Log.d(TAG, ""+child.getName());
+                List<Element> grandchildren = child.getChildren();
+                Iterator<Element> grandchildrenIterator = grandchildren.iterator();
+                boolean gotit=false;
+                while(grandchildrenIterator.hasNext())
+                {
+                	Element grandchild = grandchildrenIterator.next();
+                	if(grandchild.getName().equals("id") && grandchild.getText().equals(ct.getName()))
+                	{
+                		gotit=true;
+                		Log.d(TAG, "x");
+                	}
+                	if(gotit)
+                	{
+                		Log.d(TAG, grandchild.getName());
+                		if(grandchild.getName().equals("name"))
+                		{
+                			ct.setUserFriendlyName(grandchild.getText());
+                		}
+                		if(grandchild.getName().equals("shortDescription"))
+                		{
+                			ct.setShortDescription(grandchild.getText());
+                		}
+                		if(grandchild.getName().equals("description"))
+                		{
+                			
+                		}
+                		if(grandchild.getName().equals("categories"))
+                		{
+                			
+                		}
+                		if(grandchild.getName().equals("web"))
+                		{
+                			
+                		}
+                		if(grandchild.getName().equals("logo"))
+                		{
+                			
+                		}
+                		if(grandchild.getName().equals("redirect"))
+                		{
+                			ct.setDeprecated(true);
+                			ct.setRedirectID(grandchild.getText());
+                		}
+                	}
+                }
+            	gotit=false;
+            }
+		} 
+		catch (JDOMException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, e.getMessage());
+			e.printStackTrace();
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	
 }

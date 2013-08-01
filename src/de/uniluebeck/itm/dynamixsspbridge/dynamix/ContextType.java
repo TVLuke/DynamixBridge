@@ -37,12 +37,15 @@ public class ContextType
 	private String name;
 	private String userFriendlyName;
 	private String description;
+	private String shortDescription="";
 	private ContextEvent currentEvent=null;
 	private ArrayList<ObservableDynamixWebservice> observableservices = new ArrayList<ObservableDynamixWebservice>();
 	private ArrayList<NotObservableDynamixWebservice> notobservableservices = new ArrayList<NotObservableDynamixWebservice>();
 	private ContextType manType;
 	private int updateIntervall=10000;
 	private ContextTypeStatus status= ContextTypeStatus.INACTIVE;
+	private boolean deprecated=false;
+	private String redirect="";
 	
 	
 	private static enum ContextTypeStatus 
@@ -307,4 +310,38 @@ public class ContextType
 		return status.equals(ContextTypeStatus.WAITINGFORSUPPORT);
 	}
 	
+	public boolean isDeprecated()
+	{
+		return deprecated;
+	}
+	
+	public void setDeprecated(boolean b)
+	{
+		deprecated=b;
+	}
+	
+	public void setRedirectID(String s)
+	{
+		redirect=s;
+	}
+	
+	public String getRederictID()
+	{
+		return redirect;
+	}
+	
+	public void setUserFriendlyName(String s)
+	{
+		userFriendlyName=s;
+	}
+	
+	public String getShortDescription()
+	{
+		return shortDescription;
+	}
+	
+	public void setShortDescription(String s)
+	{
+		shortDescription=s;
+	}
 }

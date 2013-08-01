@@ -103,7 +103,9 @@ public class ContextItemView extends Activity
 		TextView nameTV = (TextView) findViewById(R.id.name);
 		nameTV.setText(name);
 
-		
+
+		TextView description = (TextView) findViewById(R.id.description);
+		description.setText(contextType.getShortDescription());
 		Log.d(TAG, "ok, trying to build a list now...");
 		ListView lv = (ListView) findViewById(R.id.pluginlistview);
 		Log.d(TAG, "a");
