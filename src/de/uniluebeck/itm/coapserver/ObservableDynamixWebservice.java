@@ -104,13 +104,14 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		Log.d(TAG, "got request");
 		try
 		{
-			Log.d(TAG, "GET");
             if(coapRequest.getCode() == Code.GET)
             {
+    			Log.d(TAG, "GET");
                 processGet(responseFuture, coapRequest);
             }
             else if(coapRequest.getCode() == Code.POST)
             {
+    			Log.d(TAG, "POST");
                 processPost(responseFuture, coapRequest);
             }
             else
@@ -127,7 +128,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 
 	private void processPost(SettableFuture<CoapResponse> responseFuture, CoapRequest request)
 	{
-		CoapResponse response;
+		CoapResponse response = null;
         Bundle scanConfig = new Bundle();
 		  try{
 	            //parse new status value
@@ -530,21 +531,38 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 			  
 		  }
 		  contexttype.requestConfiguredContextUpdate(scanConfig);
-		  response = new CoapResponse(Code.CHANGED_204);
-		  try 
-		  {
-			response.setContentType(MediaType.TEXT_PLAIN_UTF8);
-		  } 
-		  catch (InvalidOptionException e) 
-		  {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		  } 
-		  catch (ToManyOptionsException e) 
-		  {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		  }
+		  List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
+		  try
+			{
+		        //If accept option is not set in the request, use the default (TEXT_PLAIN)
+		        if(acceptOptions.isEmpty())
+		        {
+		        	Log.d(TAG, "accept optioon is empty");
+		            response = new CoapResponse(Code.CONTENT_205);
+		            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
+		            response.setContentType(TEXT_PLAIN_UTF8);
+		            responseFuture.set(response);
+		        }
+		
+		        for(Option option : request.getOption(OptionName.ACCEPT)){
+		            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
+		            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
+		            byte[] payload = createPayloadFromAcutualStatus(acceptedMediaType);
+		
+		            //the requested mediatype is supported
+		            if(payload != null)
+		            {
+		                response = new CoapResponse(Code.CONTENT_205);
+		                response.setPayload(payload);
+		                response.setContentType(acceptedMediaType);
+		                responseFuture.set(response);
+		            }
+		        }
+			}
+			catch(Exception e)
+			{
+				Log.d(TAG, "Exception at process get");
+			}
 		  responseFuture.set(response);
 	}
 	
@@ -619,7 +637,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
         	Log.d(TAG, "Difference in minutes="+(dif1/1000)/60);
         	Log.d(TAG, "Difference in hours="+((dif1/1000)/60)/60);
         	
-    		if(d.before(exp))
+    		if(dif1>0)
     		{
     			
 		    	Log.d(TAG, "mediatype="+mediaType);

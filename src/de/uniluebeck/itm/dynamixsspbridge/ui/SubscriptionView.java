@@ -64,7 +64,7 @@ public class SubscriptionView extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_subscription);
 		startService(new Intent(this, StartService.class));
-		Log.e(TAG, "onCreate() ");
+		Log.e(TAG, "onCreate()");
 		ctx=this;
 		Log.e(TAG, "IP : "+UpdateManager.getIP());
 		TextView coapip = (TextView) findViewById(R.id.coapip);

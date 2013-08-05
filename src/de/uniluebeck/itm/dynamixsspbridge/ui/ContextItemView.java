@@ -245,7 +245,7 @@ public class ContextItemView extends Activity
     	@Override
 		public void run() 
     	{
-    		Log.d(TAG, "updater ContextItem View");
+    		//Log.d(TAG, "updater ContextItem View");
 
     		ContextType contextType = UpdateManager.getTypeById(name);
     		if(contextType.active())

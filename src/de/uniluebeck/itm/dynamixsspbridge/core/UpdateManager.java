@@ -292,7 +292,7 @@ public class UpdateManager extends IntentService
 	
 	private void updateDetail(ContextType ct)
 	{
-		Log.d(TAG, ct.getName());
+		//Log.d(TAG, ct.getName());
 		final SAXBuilder builder = new SAXBuilder();
 		try 
 		{
@@ -303,7 +303,7 @@ public class UpdateManager extends IntentService
 			while(childrenIterator.hasNext())
             {
 				Element child = childrenIterator.next(); 
-                Log.d(TAG, ""+child.getName());
+                //Log.d(TAG, ""+child.getName());
                 List<Element> grandchildren = child.getChildren();
                 Iterator<Element> grandchildrenIterator = grandchildren.iterator();
                 boolean gotit=false;
@@ -313,11 +313,11 @@ public class UpdateManager extends IntentService
                 	if(grandchild.getName().equals("id") && grandchild.getText().equals(ct.getName()))
                 	{
                 		gotit=true;
-                		Log.d(TAG, "x");
+                		//Log.d(TAG, "x");
                 	}
                 	if(gotit)
                 	{
-                		Log.d(TAG, grandchild.getName());
+                		//Log.d(TAG, grandchild.getName());
                 		if(grandchild.getName().equals("name"))
                 		{
                 			ct.setUserFriendlyName(grandchild.getText());

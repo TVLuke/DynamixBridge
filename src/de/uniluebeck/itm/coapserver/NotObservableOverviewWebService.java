@@ -56,7 +56,7 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
     }
 
     //TODO: this should be PUT!
-	private void processPost(SettableFuture<CoapResponse> responseFuture, CoapRequest request) 
+	private void processPut(SettableFuture<CoapResponse> responseFuture, CoapRequest request) 
 	{
         CoapResponse response;
         try{
@@ -185,9 +185,9 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 	            {
 	                processGet(responseFuture, request);
 	            }
-	            else if(request.getCode() == Code.POST)
+	            else if(request.getCode() == Code.PUT)
 	            {
-	                processPost(responseFuture, request);
+	                processPut(responseFuture, request);
 	            }
 	            else
 	            {

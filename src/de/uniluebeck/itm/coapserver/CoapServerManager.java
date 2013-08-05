@@ -154,7 +154,14 @@ public class CoapServerManager extends Service
 			if(contexttype!=null && updateintervall>0)
 			{
 				Log.d(TAG, "The values given are cool.");
-				s.registerService(new ObservableDynamixWebservice(contexttype, updateintervall));
+				try
+				{
+					s.registerService(new ObservableDynamixWebservice(contexttype, updateintervall));
+				}
+				catch(Exception e)
+				{
+					Log.e(TAG, "was get da bitte?");
+				}
 				Log.d(TAG, "next line");
 				contexttype.activate(s.getServerPort(), updateintervall);
 				Log.d(TAG, "next line2");
