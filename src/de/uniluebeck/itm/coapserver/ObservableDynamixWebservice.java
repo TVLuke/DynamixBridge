@@ -20,6 +20,8 @@ import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.A
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,13 +38,23 @@ import android.util.Log;
 
 import com.google.common.util.concurrent.SettableFuture;
 
+import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
+import de.uniluebeck.itm.ncoap.application.client.CoapClientApplication;
+import de.uniluebeck.itm.ncoap.application.client.CoapResponseProcessor;
 import de.uniluebeck.itm.ncoap.application.server.webservice.MediaTypeNotSupportedException;
 import de.uniluebeck.itm.ncoap.application.server.webservice.ObservableWebService;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.EmptyAcknowledgementProcessor;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalEmptyAcknowledgementReceivedMessage;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalRetransmissionTimeoutMessage;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.RetransmissionTimeoutProcessor;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
+import de.uniluebeck.itm.ncoap.message.InvalidMessageException;
+import de.uniluebeck.itm.ncoap.message.MessageDoesNotAllowPayloadException;
 import de.uniluebeck.itm.ncoap.message.header.Code;
+import de.uniluebeck.itm.ncoap.message.header.MsgType;
 import de.uniluebeck.itm.ncoap.message.options.InvalidOptionException;
 import de.uniluebeck.itm.ncoap.message.options.Option;
 import de.uniluebeck.itm.ncoap.message.options.ToManyOptionsException;
@@ -55,6 +67,8 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	private static String TAG ="SSPBridge";
 	private ContextType contexttype;
 	private int updateintervall=10000;
+	private static Date d = new Date();
+	private static int counter=0;
 	
 	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
 	{
@@ -68,7 +82,60 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		setMaxAge(age);
 		this.contexttype=contexttype;
 		contexttype.registerForUpdates(this);
-		Log.d(TAG, "new Service has been established");
+		Log.d(TAG, "new Service has been established for "+contexttype.getName());
+		if(contexttype.getName().equals("org.ambientdynamix.contextplugins.context.info.sample.ping"))
+		{
+			createRequest();
+		}
+	}
+	
+	private void createRequest()
+	{
+		Log.d(TAG, "test Coap Client will be created.");
+		CoapClientApplication client = new CoapClientApplication();
+		try 
+		{
+			if(counter<100)
+			{
+				Log.d(TAG, "try");
+				URI targetURI = new URI ("coap://10.0.1.14:5683/org/ambientdynamix/contextplugins/context/info/sample/ping");
+				CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.POST, targetURI);
+				String payload ="String id=x"+counter;
+				coapRequest.setPayload(payload.getBytes(Charset.forName("UTF-8")));
+				d = new Date();
+				client.writeCoapRequest(coapRequest, new ResponseProcessor());
+			}
+		} 
+		catch (URISyntaxException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, "error 1");
+			e.printStackTrace();
+		} 
+		catch (InvalidMessageException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, "error 2");
+			e.printStackTrace();
+		} 
+		catch (ToManyOptionsException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, "error 3");
+			e.printStackTrace();
+		} 
+		catch (InvalidOptionException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, "error 4");
+			e.printStackTrace();
+		} 
+		catch (MessageDoesNotAllowPayloadException e) 
+		{
+			// TODO Auto-generated catch block
+			Log.e(TAG, "error 5");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -723,5 +790,42 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 			throws MediaTypeNotSupportedException 
 			{
 		return createPayloadFromAcutualStatus(mediaType);
+	}
+	
+	private class ResponseProcessor  implements CoapResponseProcessor, EmptyAcknowledgementProcessor, RetransmissionTimeoutProcessor 
+	{
+
+		@Override
+		public void processEmptyAcknowledgement(InternalEmptyAcknowledgementReceivedMessage message) 
+		{
+			//Log.d(TAG, "got one");
+			//createRequest();
+		}
+
+		@Override
+		public void processCoapResponse(CoapResponse coapResponse) 
+		{
+			Date d2 = new Date();
+			long x = d2.getTime()-d.getTime();
+			Log.d(TAG, "got one "+x+" ms");
+			try 
+			{
+				Thread.sleep(1000);
+			} 
+			catch (InterruptedException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			createRequest();
+		}
+
+		@Override
+		public void processRetransmissionTimeout(InternalRetransmissionTimeoutMessage timeoutMessage) 
+		{
+			//Log.d(TAG, "got one");
+			//createRequest();
+		}
+		
 	}
 }

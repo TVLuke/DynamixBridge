@@ -102,7 +102,14 @@ public class HTMLServerManager extends Service
 					.defaultFormat(Format.XML)
 					.noSerialization();
 					serverList.put(servername, s);
+					try
+					{
 					s.bind();
+					}
+					catch(Exception e)
+					{
+						Log.e(TAG, "HTML Bind failed.");
+					}
 					s.awaitShutdown();
 					Log.d(TAG, "HTML Server Base URL= "+s.getBaseUrl());
 					Log.d(TAG, "HTML Server Port= "+s.getPort());
@@ -123,7 +130,8 @@ public class HTMLServerManager extends Service
 		Log.d(TAG, "stop all HTML servers");
 		for(int i=0; i<serverList.size(); i++)
 		{
-			
+			RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
+			s.shutdown();
 		}
 	}
 	
