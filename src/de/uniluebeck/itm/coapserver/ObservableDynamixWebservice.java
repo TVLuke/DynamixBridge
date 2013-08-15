@@ -69,6 +69,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	private int updateintervall=10000;
 	private static Date d = new Date();
 	private static int counter=0;
+	private static long sumofdelays=0;
 	
 	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
 	{
@@ -101,9 +102,14 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 				URI targetURI = new URI ("coap://10.0.1.14:5683/org/ambientdynamix/contextplugins/context/info/sample/ping");
 				CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.POST, targetURI);
 				String payload ="String id=x"+counter;
+				counter++;
 				coapRequest.setPayload(payload.getBytes(Charset.forName("UTF-8")));
 				d = new Date();
 				client.writeCoapRequest(coapRequest, new ResponseProcessor());
+			}
+			else
+			{
+				
 			}
 		} 
 		catch (URISyntaxException e) 
@@ -808,6 +814,8 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 			Date d2 = new Date();
 			long x = d2.getTime()-d.getTime();
 			Log.d(TAG, "got one "+x+" ms");
+			sumofdelays=sumofdelays+x;
+			Log.d(TAG, "sum of delays="+sumofdelays);
 			try 
 			{
 				Thread.sleep(1000);
