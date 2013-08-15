@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jboss.netty.handler.codec.http.HttpMethod;
+
 import com.strategicgains.restexpress.Format;
 import com.strategicgains.restexpress.Parameters;
 import com.strategicgains.restexpress.RestExpress;
@@ -94,7 +96,11 @@ public class HTMLServerManager extends Service
 				    .setDefaultFormat(Format.XML)
 				    .putResponseProcessor(Format.JSON, ResponseProcessors.json())
 				    .putResponseProcessor(Format.XML, ResponseProcessors.xml());
-					s.uri("/contexttypes", new ObservationControler());
+					s.uri("/contexttypes", new ObservationControler())
+					.action("read", HttpMethod.GET)
+					.action("create", HttpMethod.PUT)
+					.defaultFormat(Format.XML)
+					.noSerialization();
 					serverList.put(servername, s);
 					s.bind();
 					s.awaitShutdown();

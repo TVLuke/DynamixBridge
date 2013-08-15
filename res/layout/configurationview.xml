@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".Activity"
+    android:orientation="vertical"  >
+
+   <TextView
+        android:id="@+id/adresstext"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="#FF9955"
+        android:text="Servers" />
+
+   <CheckBox
+       android:id="@+id/checkBox1"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="CoaP" />
+   <CheckBox
+       android:id="@+id/checkBox1"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="HTTP" />
+   <CheckBox
+       android:id="@+id/checkBox1"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="Atom" />
+   
+	<TextView
+        android:id="@+id/adresstext"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="#FF9955"
+        android:text="SSP" />
+
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="Address" />
+
+	<EditText
+	    android:id="@+id/editText1"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:ems="10" >
+
+	    <requestFocus />
+	</EditText>
+
+</LinearLayout>

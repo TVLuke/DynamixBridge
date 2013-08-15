@@ -530,7 +530,42 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		  {
 			  
 		  }
-		  contexttype.requestConfiguredContextUpdate(scanConfig);
+		  if(contexttype.getCurrentEvent()!=null)
+		  {
+			  String rid = contexttype.getCurrentEvent().getResponseId();
+			  contexttype.requestConfiguredContextUpdate(scanConfig);
+			  while(rid.equals(contexttype.getCurrentEvent().getResponseId()))
+			  {
+				  //wait
+				  try 
+				  {
+					Thread.sleep(5);
+				  } 
+				  catch (InterruptedException e) 
+				  {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				  }
+			  }
+		  }
+		  else
+		  {
+			  contexttype.requestConfiguredContextUpdate(scanConfig);
+			  while(!(contexttype.getCurrentEvent()!=null))
+			  {
+				  //wait
+				  try 
+				  {
+					Thread.sleep(5);
+				  } 
+				  catch (InterruptedException e) 
+				  {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				  }
+			  }
+			  
+		  }
 		  List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
 		  try
 			{

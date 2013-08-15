@@ -35,11 +35,23 @@ public class ObservationControler {
 		private static String TAG ="SSPBridge";
 	
 
-	public String create(Request request, Response response)
+	public void create(Request request, Response response)
 	{
-		Log.i(TAG, " ObservationControler POST");
+		Log.i(TAG, " ObservationControler PUT");
 		response.setResponseCreated();
-		return "tatda";
+		String format = request.getFormat();
+		Log.d(TAG, "requested Format = "+format);
+		if(format!=null)
+		{
+			
+		}
+		else
+		{
+			format=Format.XML;
+		}
+		String action = (String) request.getParameter("actiontype");
+		Log.d(TAG, 	action );
+		response.setResponseStatus(HttpResponseStatus.CREATED);
 	}
 
 	public String delete(Request request, Response response)
@@ -54,6 +66,14 @@ public class ObservationControler {
 		Log.i(TAG, " ObservationControler GET");
 		String format = request.getFormat();
 		Log.d(TAG, "requested Format = "+format);
+		if(format!=null)
+		{
+			
+		}
+		else
+		{
+			format=Format.XML;
+		}
 		response.setResponseStatus(HttpResponseStatus.OK);
 		if(format.equals(Format.XML))
 		{
@@ -61,7 +81,7 @@ public class ObservationControler {
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());
 			ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-			String result ="<response>\n";
+			String result ="<contexttypes>\n";
 			for(int i=0; i<types.size(); i++)
 	    	{
 	    		String key = (String) types.keySet().toArray()[i];
@@ -71,9 +91,14 @@ public class ObservationControler {
 	    		 result=result+"    <name>"+type.getName()+"</name>\n";
 	    		 result=result+"    <readablename>"+type.getUserFriendlyName()+"</readablename>\n";
 	    		 result=result+"    <description>"+type.getDescription()+"</description>\n";
+	    		 result=result+"    <active>"+type.active()+"</active>\n";
+	    		 if(type.active())
+	    		 {
+	    			 result=result+"     <url>http://"+UpdateManager.getIP()+"/"+type.getName().replace(".", "/")+"/</url>\n";
+	    		 }
 	    		 result=result+"  </contexttype>\n";
 	    	}
-			result=result+"</response>";
+			result=result+"</contexttypes>";
 			response.setBody(result);
 			//response.serialize();
 			response.setResponseCreated();

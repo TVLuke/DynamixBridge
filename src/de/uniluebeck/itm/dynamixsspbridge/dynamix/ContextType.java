@@ -25,6 +25,7 @@ import org.ambientdynamix.api.application.ContextEvent;
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
+import de.uniluebeck.itm.htmlserver.HTTPDynamixControler;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class ContextType
 	private ContextEvent currentEvent=null;
 	private ArrayList<ObservableDynamixWebservice> observableservices = new ArrayList<ObservableDynamixWebservice>();
 	private ArrayList<NotObservableDynamixWebservice> notobservableservices = new ArrayList<NotObservableDynamixWebservice>();
+	private ArrayList<HTTPDynamixControler> httpContextTypeControler = new ArrayList<HTTPDynamixControler>();
 	private ContextType manType;
 	private int updateIntervall=10000;
 	private ContextTypeStatus status= ContextTypeStatus.INACTIVE;

@@ -140,7 +140,7 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
     	if(mediaType == APP_XML)
         {
             StringBuffer payload = new StringBuffer();
-            payload.append("<response>\n");
+            payload.append("<contexttypes>\n");
         	ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
         	for(int i=0; i<types.size(); i++)
         	{
@@ -151,9 +151,14 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
         		 payload.append("    <name>"+type.getName()+"</name>\n");
         		 payload.append("    <readablename>"+type.getUserFriendlyName()+"</readablename>\n");
         		 payload.append("    <description>"+type.getDescription()+"</description>\n");
+        		 payload.append("    <active>"+type.active()+"</active>\n");
+        		 if(type.active())
+        		 {
+        			 payload.append("     <url>http://"+UpdateManager.getIP()+"/"+type.getName().replace(".", "/")+"/</url>\n");
+        		 }
         		 payload.append("  </contexttype>\n");
         	}
-            payload.append("</response>");
+            payload.append("</contexttypes>");
 
             return payload.toString().getBytes(Charset.forName("UTF-8"));
         }
