@@ -62,6 +62,7 @@ public class NotificationService extends Service
 			id++;
 			Log.d(TAG, "ctx!=null");
 			NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE); 
+			notificationManager.cancel(id);
 			Intent intent = new Intent(ctx,SubscriptionView.class);
 			PendingIntent pIntent = PendingIntent.getActivity(ctx, id, intent, 0);
 			Notification noti = new Notification.Builder(ctx)
@@ -82,6 +83,8 @@ public class NotificationService extends Service
 	public void onDestroy()
 	{
 		super.onDestroy();
+		NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE); 
+		notificationManager.cancel(id);
 	}
 	
 	public static void requestContext(String payload) 

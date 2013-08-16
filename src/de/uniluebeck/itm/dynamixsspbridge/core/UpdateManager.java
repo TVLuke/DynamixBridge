@@ -62,7 +62,7 @@ public class UpdateManager extends IntentService
 	public UpdateManager() 
 	{
 		super("UpdateManager");
-		Log.i(TAG, "updatemanager: Constructir");
+		//Log.i(TAG, "updatemanager: Constructor");
 	}
 
 
@@ -71,14 +71,14 @@ public class UpdateManager extends IntentService
 	public void onCreate() 
 	{
 		super.onCreate();
-		Log.i(TAG, "updatemanager: on create");
+		//Log.i(TAG, "updatemanager: on create");
 	}
 		
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
 		super.onStartCommand(intent, flags, startId);
-		Log.i(TAG, "updatemanager on start command");
+		//Log.i(TAG, "updatemanager on start command");
 		//Log.i(TAG, "Received start id " + startId + ": " + intent);
 		return Service.START_NOT_STICKY;
 	}
@@ -86,15 +86,15 @@ public class UpdateManager extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent) 
 	{
-		Log.i(TAG, "updatemanager handle");
+		//Log.i(TAG, "updatemanager handle");
 		//get the needed lists and variables in
 		SharedPreferences prefs = getSharedPreferences(PREFS, 0);
 		contexttypes = DynamixConnectionService.updateContextTypes();
-		Log.i(TAG, "updatemanager handle2");
+		//Log.i(TAG, "updatemanager handle2");
 		//Update the IP and find if it has changed
 		if(localIPv4.equals("")) //FIRST START
 		{
-			Log.i(TAG, "getIPs");
+			//Log.i(TAG, "getIPs");
 			localIPv4=Utils.getIPAddress(true);
 			localIPv6=Utils.getIPAddress(false);
 			countdowntorestart=-1;
@@ -103,11 +103,11 @@ public class UpdateManager extends IntentService
 		{
 			if(localIPv4.equals(Utils.getIPAddress(true)))
 			{
-				Log.i(TAG, "we are in a old network");
+				//Log.i(TAG, "we are in a old network");
 			}
 			else
 			{
-				Log.i(TAG, "we are in a new network");
+				//Log.i(TAG, "we are in a new network");
 				//we got into a new network
 				//deactivate all context types
 				Set<String> keyset = contexttypes.keySet();
@@ -126,7 +126,7 @@ public class UpdateManager extends IntentService
 					}
 				}
 				//stop all servers
-				CoapServerManager.stopAllServers();
+				ManagerManager.stopAllServers();
 				countdowntorestart--;
 				//we don't restart servers at once, they need a bit of time to shut down
 				
@@ -135,26 +135,26 @@ public class UpdateManager extends IntentService
 			localIPv6=Utils.getIPAddress(false);
 		}
 		boolean useIPv4= prefs.getBoolean("CoapUseIPv4", true);
-		Log.i(TAG, "updatemanager handle3");
+		//Log.i(TAG, "updatemanager handle3");
 		//TODO: find if we are in a nated lan and if so, take the appropiate steps to get an address
 		//restart server if it has been shut down and the countdown has ended
 		if(countdowntorestart<1)
 		{
-			Log.i(TAG, "coundown to restart: "+countdowntorestart);
+			//Log.i(TAG, "coundown to restart: "+countdowntorestart);
 			countdowntorestart--;
 			if(countdowntorestart<0)
 			{
-				Log.i(TAG, "restart");
+				//Log.i(TAG, "restart");
 				countdowntorestart=1;
 				//restart all servers (which right now is just one)
-				CoapServerManager.startServer("s1");
+				ManagerManager.startServer("Dynamix");
 			}
 		}
 		//check if we have any outstanding subscriptions. This can be seen by the fact, that  the shared preferences say, the type has been activated but
 		//the context type does not support that.
 		if(DynamixConnectionService.isConnected())
 		{
-			Log.i(TAG, "dynamix is connected");
+			//Log.i(TAG, "dynamix is connected");
 			//OK, we seem to have a connected Dynmix
 			Set<String> keyset = contexttypes.keySet();
 			Iterator<String> it = keyset.iterator();
@@ -171,8 +171,7 @@ public class UpdateManager extends IntentService
 					}
 					if(ct.contextSupported() && !ct.active() && ct!=null)
 					{
-						Log.i(TAG, ct.getName()+" totally should start." +
-								" However it is already subscribed, which is a problem.");
+						//Log.i(TAG, ct.getName()+" totally should start." + " However it is already subscribed, which is a problem.");
 						ct.unsubscribe();
 					}
 					
@@ -214,7 +213,7 @@ public class UpdateManager extends IntentService
 	public void onDestroy()
 	{
 		super.onDestroy();
-		Log.i(TAG, "updatemanager: on destroy");
+		//Log.i(TAG, "updatemanager: on destroy");
 		if(!run)
 		{
 			run=true;
@@ -225,7 +224,7 @@ public class UpdateManager extends IntentService
 	{
 		if(run)
 		{
-			Log.d(TAG, "updatemanager: sNext");
+			//Log.d(TAG, "updatemanager: sNext");
 	        Calendar cal = Calendar.getInstance();
         	cal.add(Calendar.MINUTE, 1);
 	        intent = new Intent(this, UpdateManager.class);
@@ -365,6 +364,5 @@ public class UpdateManager extends IntentService
 			e.printStackTrace();
 		}
 	}
-	
 	
 }

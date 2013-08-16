@@ -19,7 +19,7 @@ package de.uniluebeck.itm.dynamixsspbridge.core;
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
-import de.uniluebeck.itm.htmlserver.HTMLServerManager;
+import de.uniluebeck.itm.htmlserver.HTTPServerManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -57,7 +57,8 @@ public class StartService extends Service
 		Log.d(TAG, "START SERVICE ON DESTROY GET CALLED...3");
 		stopService(new Intent(this, DynamixConnectionService.class));
 		stopService(new Intent(this, CoapServerManager.class));
-		stopService(new Intent(this, HTMLServerManager.class));
+		stopService(new Intent(this, HTTPServerManager.class));
+		stopService(new Intent(this, ManagerManager.class));
 		stopService(new Intent(this, UpdateManager.class));
 		stopService(new Intent(this, NotificationService.class));
 		UpdateManager.deactivate();
@@ -76,7 +77,8 @@ public class StartService extends Service
 			{
 				startService(new Intent(this, DynamixConnectionService.class));
 				startService(new Intent(this, CoapServerManager.class));
-				startService(new Intent(this, HTMLServerManager.class));
+				startService(new Intent(this, HTTPServerManager.class));
+				startService(new Intent(this, ManagerManager.class));
 				startService(new Intent(this, UpdateManager.class));
 				startService(new Intent(this, NotificationService.class));
 				UpdateManager.updateList();

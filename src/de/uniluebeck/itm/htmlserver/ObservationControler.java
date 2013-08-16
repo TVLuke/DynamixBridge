@@ -19,21 +19,28 @@ package de.uniluebeck.itm.htmlserver;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
+import android.os.Bundle;
 import android.util.Log;
 
+import com.strategicgains.restexpress.ContentType;
 import com.strategicgains.restexpress.Format;
 import com.strategicgains.restexpress.Request;
 import com.strategicgains.restexpress.Response;
 
+import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
+import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
 
-public class ObservationControler {
+public class ObservationControler 
+{
 
-		private static String TAG ="SSPBridge";
-	
+	private static String TAG ="SSPBridge";
+	private ContextType contexttype;
 
 	public void create(Request request, Response response)
 	{
@@ -41,17 +48,23 @@ public class ObservationControler {
 		response.setResponseCreated();
 		String format = request.getFormat();
 		Log.d(TAG, "requested Format = "+format);
-		if(format!=null)
-		{
-			
-		}
-		else
-		{
-			format=Format.XML;
-		}
-		String action = (String) request.getParameter("actiontype");
-		Log.d(TAG, 	action );
-		response.setResponseStatus(HttpResponseStatus.CREATED);
+		ChannelBuffer body = request.getBody();
+		byte[] ba = body.array();
+		String payload = new String(ba);
+		//Bundle scanConfig = ManagerManager.parseRequest(payload);
+		//ManagerManager.updateToReleventEvent(contexttype, scanConfig);
+		final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+        ContextType type = (ContextType)contexttypes.get(payload);
+        if(type!=null)
+        {
+           	Log.d(TAG, "type!=null");
+           	NotificationService.requestContext(payload);
+           	response.setResponseStatus(HttpResponseStatus.CREATED);
+        }
+        else
+        {
+        	response.setResponseStatus(HttpResponseStatus.NOT_FOUND);
+        }
 	}
 
 	public String delete(Request request, Response response)
@@ -66,41 +79,15 @@ public class ObservationControler {
 		Log.i(TAG, " ObservationControler GET");
 		String format = request.getFormat();
 		Log.d(TAG, "requested Format = "+format);
-		if(format!=null)
-		{
-			
-		}
-		else
-		{
-			format=Format.XML;
-		}
+		byte[] r = ManagerManager.createContextTypeListResponse(format);
 		response.setResponseStatus(HttpResponseStatus.OK);
+		
 		if(format.equals(Format.XML))
 		{
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());
-			ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-			String result ="<contexttypes>\n";
-			for(int i=0; i<types.size(); i++)
-	    	{
-	    		String key = (String) types.keySet().toArray()[i];
-	    		ContextType type = types.get(key);
-	    		//payload=payload+type.getName();
-	    		 result=result+"  <contexttype>\n";
-	    		 result=result+"    <name>"+type.getName()+"</name>\n";
-	    		 result=result+"    <readablename>"+type.getUserFriendlyName()+"</readablename>\n";
-	    		 result=result+"    <description>"+type.getDescription()+"</description>\n";
-	    		 result=result+"    <active>"+type.active()+"</active>\n";
-	    		 if(type.active())
-	    		 {
-	    			 result=result+"     <url>http://"+UpdateManager.getIP()+"/"+type.getName().replace(".", "/")+"/</url>\n";
-	    		 }
-	    		 result=result+"  </contexttype>\n";
-	    	}
-			result=result+"</contexttypes>";
-			response.setBody(result);
-			//response.serialize();
+			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.JSON))
@@ -118,4 +105,6 @@ public class ObservationControler {
 		response.setResponseCreated();
 		return "tatda";
 	}
+	
+	
 }

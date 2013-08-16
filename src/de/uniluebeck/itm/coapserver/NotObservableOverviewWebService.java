@@ -16,6 +16,7 @@
 
 package de.uniluebeck.itm.coapserver;
 
+import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
@@ -125,7 +126,7 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		}
 		catch(Exception e)
 		{
-			Log.d(TAG, "Exception at process get");
+			Log.d(TAG, "Exception at process get ");
 		}
 
         //This is only reached if all accepted mediatypes are not supported!
@@ -137,47 +138,8 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
     private byte[] createPayloadFromAcutualStatus(MediaType mediaType)
     {
     	Log.d(TAG, ""+mediaType);
-    	if(mediaType == APP_XML)
-        {
-            StringBuffer payload = new StringBuffer();
-            payload.append("<contexttypes>\n");
-        	ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-        	for(int i=0; i<types.size(); i++)
-        	{
-        		String key = (String) types.keySet().toArray()[i];
-        		ContextType type = types.get(key);
-        		//payload=payload+type.getName();
-        		 payload.append("  <contexttype>\n");
-        		 payload.append("    <name>"+type.getName()+"</name>\n");
-        		 payload.append("    <readablename>"+type.getUserFriendlyName()+"</readablename>\n");
-        		 payload.append("    <description>"+type.getDescription()+"</description>\n");
-        		 payload.append("    <active>"+type.active()+"</active>\n");
-        		 if(type.active())
-        		 {
-        			 payload.append("     <url>http://"+UpdateManager.getIP()+"/"+type.getName().replace(".", "/")+"/</url>\n");
-        		 }
-        		 payload.append("  </contexttype>\n");
-        	}
-            payload.append("</contexttypes>");
-
-            return payload.toString().getBytes(Charset.forName("UTF-8"));
-        }
-        else if(mediaType == TEXT_PLAIN_UTF8)
-        {
-        	ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-        	String payload="";
-        	for(int i=0; i<types.size(); i++)
-        	{
-        		String key = (String) types.keySet().toArray()[i];
-        		ContextType type = types.get(key);
-        		payload=payload+"\n -"+type.getName();
-        	}
-            return payload.getBytes(Charset.forName("UTF-8"));
-        }
-        else
-        {
-            return null;
-        }
+		byte[] r = ManagerManager.createContextTypeListResponse(mediaType);
+		return r;
     }
 
 	@Override

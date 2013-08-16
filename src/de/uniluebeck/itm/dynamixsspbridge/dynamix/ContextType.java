@@ -25,6 +25,7 @@ import org.ambientdynamix.api.application.ContextEvent;
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
+import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.htmlserver.HTTPDynamixControler;
 
 import android.os.Bundle;
@@ -148,6 +149,11 @@ public class ContextType
 		}
 	}
 	
+	public void registerForUpdates(HTTPDynamixControler service) 
+	{
+		httpContextTypeControler.add(service);		
+	}
+	
 	public void requestContextUpdate()
 	{
 		Log.d(TAG, "request update from...");
@@ -252,6 +258,7 @@ public class ContextType
 		updateIntervall=10000;
 		observableservices.clear();
 		notobservableservices.clear();
+		httpContextTypeControler.clear();
 	}
 	
 	public ContextType getManType()
@@ -269,13 +276,13 @@ public class ContextType
 		if(status.equals(ContextTypeStatus.WAITINGFORSUPPORT))
 		{
 			status=ContextTypeStatus.SUPPORTED;
-			CoapServerManager.addService(this, getUpdateIntervall());
+			ManagerManager.addService(this, getUpdateIntervall());
 		}
 	}
 
 	public void contextsupportremoved() 
 	{
-		CoapServerManager.removeService(this);
+		ManagerManager.removeService(this);
 		status = ContextTypeStatus.INACTIVE;
 	}
 	
@@ -346,4 +353,5 @@ public class ContextType
 	{
 		shortDescription=s;
 	}
+
 }

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+import de.uniluebeck.itm.dynamixsspbridge.core.IServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
@@ -55,7 +56,7 @@ public class CoapServerManager extends Service
 	{
 		super.onStartCommand(intent, flags, startId);
 		Log.i(TAG, "coap manager: bla2");
-		startServer("s1");
+		startServer("Dynamix");
 		return START_STICKY;
 	}
 	
@@ -66,11 +67,13 @@ public class CoapServerManager extends Service
 		super.onDestroy();	
 	}
 	
+
 	public static void startServer(String servername)
 	{
 		startServer(servername, 5683);
 	}
 	
+
 	public static void startServer(String servername, int port)
 	{
 		Log.d(TAG, "Start server "+servername);
@@ -150,10 +153,10 @@ public class CoapServerManager extends Service
 		DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[0]));
 		if(s!=null)
 		{
-			Log.d(TAG, "server is not null.");
+			//Log.d(TAG, "server is not null.");
 			if(contexttype!=null && updateintervall>0)
 			{
-				Log.d(TAG, "The values given are cool.");
+				//Log.d(TAG, "The values given are cool.");
 				try
 				{
 					s.registerService(new ObservableDynamixWebservice(contexttype, updateintervall));
@@ -162,18 +165,18 @@ public class CoapServerManager extends Service
 				{
 					Log.e(TAG, "was get da bitte?");
 				}
-				Log.d(TAG, "next line");
+				//Log.d(TAG, "next line");
 				contexttype.activate(s.getServerPort(), updateintervall);
-				Log.d(TAG, "next line2");
+				//Log.d(TAG, "next line2");
 				if(!contexttype.getName().endsWith(".man"))
 				{
-					Log.d(TAG, "in the if");
+					//Log.d(TAG, "in the if");
 					s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
-					Log.d(TAG, "still");
+					//Log.d(TAG, "still");
 					contexttype.getManType().activate(s.getServerPort(), updateintervall);
 				}
-				Log.d(TAG, "whatup");
-			Log.d(TAG, "done");
+				//Log.d(TAG, "whatup");
+				//Log.d(TAG, "done");
 			}
 		}
 		else

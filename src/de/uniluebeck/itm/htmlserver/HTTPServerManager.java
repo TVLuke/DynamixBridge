@@ -31,6 +31,7 @@ import com.strategicgains.restexpress.RestExpress;
 
 import de.uniluebeck.itm.coapserver.DynamixCoapServer;
 import de.uniluebeck.itm.coapserver.NotObservableOverviewWebService;
+import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
 
@@ -39,7 +40,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-public class HTMLServerManager extends Service
+public class HTTPServerManager extends Service
 {
 
 	private static String TAG ="SSPBridge";
@@ -56,15 +57,14 @@ public class HTMLServerManager extends Service
 	public void onCreate() 
 	{
 		super.onCreate();
-		 Log.e(TAG, "HTML bla1b");
+		 Log.e(TAG, "HTTP bla1b");
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
 		super.onStartCommand(intent, flags, startId);
-		Log.i(TAG, "HTML manager: bla3");
-		startServer("s1");
+		Log.i(TAG, "HTTPmanager: bla3");
 		return START_STICKY;
 	}
 	
@@ -82,7 +82,7 @@ public class HTMLServerManager extends Service
 	
 	public static void startServer(final String servername, final int port)
 	{
-		Log.d(TAG, "Start HTML server "+servername);
+		Log.d(TAG, "Start HTTP server "+servername);
 		try
 		{
 			Thread tt = new Thread(new Runnable()
@@ -96,23 +96,23 @@ public class HTMLServerManager extends Service
 				    .setDefaultFormat(Format.XML)
 				    .putResponseProcessor(Format.JSON, ResponseProcessors.json())
 				    .putResponseProcessor(Format.XML, ResponseProcessors.xml());
+					serverList.put(servername, s);
 					s.uri("/contexttypes", new ObservationControler())
 					.action("read", HttpMethod.GET)
 					.action("create", HttpMethod.PUT)
 					.defaultFormat(Format.XML)
 					.noSerialization();
-					serverList.put(servername, s);
 					try
 					{
-					s.bind();
+						s.bind();
 					}
 					catch(Exception e)
 					{
-						Log.e(TAG, "HTML Bind failed.");
+						Log.e(TAG, "HTTP Bind failed.");
 					}
 					s.awaitShutdown();
-					Log.d(TAG, "HTML Server Base URL= "+s.getBaseUrl());
-					Log.d(TAG, "HTML Server Port= "+s.getPort());
+					Log.d(TAG, "HTTP Server Base URL= "+s.getBaseUrl());
+					Log.d(TAG, "HTTP Server Port= "+s.getPort());
 				}
 			});
 			tt.start(); 
@@ -120,14 +120,14 @@ public class HTMLServerManager extends Service
 		}
 		catch(Exception e)
 		{
-			Log.e(TAG, "Some HTML handling seems to be missing.");
+			Log.e(TAG, "Some HTTP handling seems to be missing.");
 			//startServer(servername, port++);
 		}
 	}
 	
 	public static void stopAllServers()
 	{
-		Log.d(TAG, "stop all HTML servers");
+		Log.d(TAG, "stop all HTTP servers");
 		for(int i=0; i<serverList.size(); i++)
 		{
 			RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
@@ -137,16 +137,95 @@ public class HTMLServerManager extends Service
 	
 	public static void stopServer(String serverName)
 	{
-		
+		RestExpress s = serverList.get(serverName);
+		if(s!=null)
+		{
+			s.shutdown();
+			serverList.remove(serverName);
+		}
 	}
 	
 	public static void addService(ContextType contexttype, int updateintervall)
 	{
-		
+		Log.d(TAG, "add Service");
+		Log.d(TAG, "serverList size="+serverList.size());
+		Thread tt = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				for(int i=0; i<serverList.size(); i++)
+				{
+					RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
+					Log.d(TAG, "1");
+					s.shutdown();
+					Log.d(TAG, "2");
+				}
+				for(int i=0; i<serverList.size(); i++)
+				{
+					Log.d(TAG, "3");
+					RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
+					Log.d(TAG, "4");
+					String servername = s.getName();
+					Log.d(TAG, "5");
+					int port = s.getPort();
+					Log.d(TAG, "6");
+					Log.d(TAG, "restarting "+servername+" at port "+port);
+					s = new RestExpress()
+					.setName(servername)
+				    .setPort(port)
+				    .setDefaultFormat(Format.XML)
+				    .putResponseProcessor(Format.JSON, ResponseProcessors.json())
+				    .putResponseProcessor(Format.XML, ResponseProcessors.xml());
+					Log.d(TAG, "7");
+					serverList.put(servername, s);
+					s.uri("/contexttypes", new ObservationControler())
+					.action("read", HttpMethod.GET)
+					.action("create", HttpMethod.PUT)
+					.defaultFormat(Format.XML)
+					.noSerialization();
+					ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
+					for(int j=0; j<types.size(); j++)
+			    	{
+			    		String key = (String) types.keySet().toArray()[j];
+			    		ContextType type = types.get(key);
+			    		if(type.contextSupported())
+			    		{
+			    			Log.d(TAG, "HTTP for "+type.getName());
+			    			s.uri(type.getName().replace(".", "/"), new HTTPDynamixControler(type, type.getUpdateIntervall()))
+			    			.action("read", HttpMethod.GET)
+			    			.action("create", HttpMethod.PUT)
+			    			.defaultFormat(Format.XML)
+			    			.noSerialization();
+			    			if(!type.getName().endsWith(".man"))
+			    			{
+			    				s.uri("/"+type.getManType().getName().replace(".", "/")+"/man", new HTTPDynamixControler(type.getManType(), type.getUpdateIntervall()))
+			    				.action("read", HttpMethod.GET)
+			    				.action("create", HttpMethod.PUT)
+			    				.defaultFormat(Format.XML)
+			    				.noSerialization();
+			    			}
+			    		}
+			    	}
+					try
+					{
+						s.bind();
+					}
+					catch(Exception e)
+					{
+						Log.e(TAG, "HTTP Bind failed.");
+					}
+					s.awaitShutdown();
+					
+				}
+			}
+		});
+		tt.start(); 
 	}
 	
 	public static void removeService(ContextType contexttype)
 	{
-		
+		RestExpress s = serverList.get((String) (serverList.keySet().toArray()[0]));
+		s.uri("/"+contexttype.getName().replace(".", "/"), null);
 	}
 }

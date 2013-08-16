@@ -176,99 +176,119 @@ public class DynamixConnectionService extends Service
 			// Open a Dynamix Session if it's not already opened
 			if (dynamix != null) {
 				if (!dynamix.isSessionOpen())
+				{
 					dynamix.openSession();
+				}
 				else
+				{
 					registerForContextTypes();
+				}
 					
-			} else
+			} 
+			else
+			{
 				Log.i(TAG, "dynamix already connected");
+			}
 		}
 
 		@Override
-		public void onDynamixListenerRemoved() throws RemoteException {
+		public void onDynamixListenerRemoved() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onDynamixListenerRemoved");
 		}
 
 		@Override
-		public void onSessionOpened(String sessionId) throws RemoteException {
+		public void onSessionOpened(String sessionId) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onSessionOpened");
 			registerForContextTypes();
 		}
 
 		@Override
-		public void onSessionClosed() throws RemoteException {
+		public void onSessionClosed() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onSessionClosed");
 		}
 
 		@Override
-		public void onAwaitingSecurityAuthorization() throws RemoteException {
+		public void onAwaitingSecurityAuthorization() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onAwaitingSecurityAuthorization");
 		}
 
 		@Override
-		public void onSecurityAuthorizationGranted() throws RemoteException {
+		public void onSecurityAuthorizationGranted() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onSecurityAuthorizationGranted");
 		}
 
 		@Override
-		public void onSecurityAuthorizationRevoked() throws RemoteException {
+		public void onSecurityAuthorizationRevoked() throws RemoteException 
+		{
 			Log.w(TAG, "A1 - onSecurityAuthorizationRevoked");
 		}
 
 		@Override
-		public void onContextSupportAdded(ContextSupportInfo supportInfo) throws RemoteException {
-			Log.i(TAG,
-					"A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "
-							+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
+		public void onContextSupportAdded(ContextSupportInfo supportInfo) throws RemoteException 
+		{
+			Log.i(TAG, "A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
 			ContextType ct= allContextTypes.get(supportInfo.getContextType());
 			ct.contextsupportadded();
 		}
 
 		@Override
-		public void onContextSupportRemoved(ContextSupportInfo supportInfo) throws RemoteException {
+		public void onContextSupportRemoved(ContextSupportInfo supportInfo) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextSupportRemoved for " + supportInfo.getSupportId());
 			ContextType ct= allContextTypes.get(supportInfo.getContextType());
 			ct.contextsupportremoved();			
 		}
 
 		@Override
-		public void onContextTypeNotSupported(String contextType) throws RemoteException {
+		public void onContextTypeNotSupported(String contextType) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextTypeNotSupported for " + contextType);
 		}
 
 		@Override
-		public void onInstallingContextSupport(ContextPluginInformation plug, String contextType)
-				throws RemoteException {
+		public void onInstallingContextSupport(ContextPluginInformation plug, String contextType) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onInstallingContextSupport: plugin = " + plug + " | Context Type = " + contextType);
 		}
 		
 		@Override
-		public void onContextPluginInstallProgress(ContextPluginInformation plug, int percentComplete) throws RemoteException {
+		public void onContextPluginInstallProgress(ContextPluginInformation plug, int percentComplete) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginInstallProgress for " + plug + " with % " + percentComplete);			
 		}
 
 		@Override
-		public void onInstallingContextPlugin(ContextPluginInformation plug) throws RemoteException {
+		public void onInstallingContextPlugin(ContextPluginInformation plug) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onInstallingContextPlugin: plugin = " + plug);
 		}
 
 		@Override
-		public void onContextPluginInstalled(ContextPluginInformation plug) throws RemoteException {
+		public void onContextPluginInstalled(ContextPluginInformation plug) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginInstalled for " + plug);
 		}
 
 		@Override
-		public void onContextPluginUninstalled(ContextPluginInformation plug) throws RemoteException {
+		public void onContextPluginUninstalled(ContextPluginInformation plug) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginUninstalled for " + plug);
 		}
 
 		@Override
-		public void onContextPluginInstallFailed(ContextPluginInformation plug, String message) throws RemoteException {
+		public void onContextPluginInstallFailed(ContextPluginInformation plug, String message) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginInstallFailed for " + plug + " with message: " + message);
 		}
 
 		@Override
-		public void onContextEvent(ContextEvent event) throws RemoteException {
+		public void onContextEvent(ContextEvent event) throws RemoteException 
+		{
 			/*
 			 * Log some information about the incoming event
 			 */
@@ -288,7 +308,8 @@ public class DynamixConnectionService extends Service
 			/*
 			 * To illustrate how string-based context representations are accessed, we log each contained in the event.
 			 */
-			for (String format : event.getStringRepresentationFormats()) {
+			for (String format : event.getStringRepresentationFormats()) 
+			{
 				Log.i(TAG,
 						"Event string-based format: " + format + " contained data: "
 								+ event.getStringRepresentation(format));
@@ -300,33 +321,38 @@ public class DynamixConnectionService extends Service
 		}
 
 		@Override
-		public void onContextRequestFailed(String requestId, String errorMessage, int errorCode) throws RemoteException {
+		public void onContextRequestFailed(String requestId, String errorMessage, int errorCode) throws RemoteException 
+		{
 			Log.w(TAG, "A1 - onContextRequestFailed for requestId " + requestId + " with error message: " + errorMessage);
 		}
 
 		@Override
-		public void onContextPluginDiscoveryStarted() throws RemoteException {
+		public void onContextPluginDiscoveryStarted() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginDiscoveryStarted");
 		}
 
 		@Override
-		public void onContextPluginDiscoveryFinished(List<ContextPluginInformation> discoveredPlugins)
-				throws RemoteException {
+		public void onContextPluginDiscoveryFinished(List<ContextPluginInformation> discoveredPlugins) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginDiscoveryFinished");
 		}
 
 		@Override
-		public void onDynamixFrameworkActive() throws RemoteException {
+		public void onDynamixFrameworkActive() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onDynamixFrameworkActive");
 		}
 
 		@Override
-		public void onDynamixFrameworkInactive() throws RemoteException {
+		public void onDynamixFrameworkInactive() throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onDynamixFrameworkInactive");
 		}
 
 		@Override
-		public void onContextPluginError(ContextPluginInformation plug, String message) throws RemoteException {
+		public void onContextPluginError(ContextPluginInformation plug, String message) throws RemoteException 
+		{
 			Log.i(TAG, "A1 - onContextPluginError for " + plug + " with message " + message);
 		}
 	};
@@ -444,7 +470,7 @@ public class DynamixConnectionService extends Service
 		{
 			try 
 			{
-				Log.d(TAG, "try to unsubscrube");
+				Log.d(TAG, "try to unsubscrube from "+contexttype.getName());
 				if(dynamix.isSessionOpen())
 				{
 					Log.d(TAG, "dynamix session is open");
@@ -455,6 +481,7 @@ public class DynamixConnectionService extends Service
 			catch (RemoteException e) 
 			{
 				// TODO Auto-generated catch block
+				Log.e(TAG, "error on unsubscribe");
 				e.printStackTrace();
 			}
 		}
@@ -474,6 +501,7 @@ public class DynamixConnectionService extends Service
 		catch (RemoteException e) 
 		{
 			// TODO Auto-generated catch block
+			Log.e(TAG, "erro on context request");
 			e.printStackTrace();
 		}
 	}
