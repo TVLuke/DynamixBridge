@@ -19,9 +19,9 @@ package de.uniluebeck.itm.htmlserver;
 
 import com.strategicgains.restexpress.RestExpress;
 
-public class DynamixHTMLServer extends RestExpress{
+public class DynamixHTTPServer extends RestExpress{
 
-	public DynamixHTMLServer()
+	public DynamixHTTPServer()
 	{
 		super();
 	}

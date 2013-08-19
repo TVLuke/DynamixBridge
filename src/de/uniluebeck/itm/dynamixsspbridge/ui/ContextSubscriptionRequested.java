@@ -170,7 +170,14 @@ public class ContextSubscriptionRequested extends Activity
     		if(contextType.active())
             {
             	TextView url = (TextView) findViewById(R.id.ipandport);
+            	try
+            	{
             	url.setText("coap://"+UpdateManager.getIP()+":"+"5683"+"/"+name.replace(".", "/"));
+            	}
+            	catch (Exception e)
+            	{
+            		//nothing
+            	}
            		ImageView image = (ImageView) findViewById(R.id.imageView1);
            		image.setImageResource(R.drawable.active);
             }

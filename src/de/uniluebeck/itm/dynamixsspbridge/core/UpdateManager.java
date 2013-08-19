@@ -92,7 +92,7 @@ public class UpdateManager extends IntentService
 		contexttypes = DynamixConnectionService.updateContextTypes();
 		//Log.i(TAG, "updatemanager handle2");
 		//Update the IP and find if it has changed
-		if(localIPv4.equals("")) //FIRST START
+		if(localIPv4.equals("") || localIPv6.equals("")) //FIRST START
 		{
 			//Log.i(TAG, "getIPs");
 			localIPv4=Utils.getIPAddress(true);
@@ -134,78 +134,85 @@ public class UpdateManager extends IntentService
 			localIPv4=Utils.getIPAddress(true);
 			localIPv6=Utils.getIPAddress(false);
 		}
-		boolean useIPv4= prefs.getBoolean("CoapUseIPv4", true);
-		//Log.i(TAG, "updatemanager handle3");
-		//TODO: find if we are in a nated lan and if so, take the appropiate steps to get an address
-		//restart server if it has been shut down and the countdown has ended
-		if(countdowntorestart<1)
+		if(!localIPv4.equals("") || !localIPv6.equals(""))
 		{
-			//Log.i(TAG, "coundown to restart: "+countdowntorestart);
-			countdowntorestart--;
-			if(countdowntorestart<0)
+			boolean useIPv4= prefs.getBoolean("CoapUseIPv4", true);
+			//Log.i(TAG, "updatemanager handle3");
+			//TODO: find if we are in a nated lan and if so, take the appropiate steps to get an address
+			//restart server if it has been shut down and the countdown has ended
+			if(countdowntorestart<1)
 			{
-				//Log.i(TAG, "restart");
-				countdowntorestart=1;
-				//restart all servers (which right now is just one)
-				ManagerManager.startServer("Dynamix");
-			}
-		}
-		//check if we have any outstanding subscriptions. This can be seen by the fact, that  the shared preferences say, the type has been activated but
-		//the context type does not support that.
-		if(DynamixConnectionService.isConnected())
-		{
-			//Log.i(TAG, "dynamix is connected");
-			//OK, we seem to have a connected Dynmix
-			Set<String> keyset = contexttypes.keySet();
-			Iterator<String> it = keyset.iterator();
-			while(it.hasNext())
-			{
-				String key = it.next();
-				boolean shouldbeactive= prefs.getBoolean(key, false);
-				ContextType ct = contexttypes.get(key);
-				if(shouldbeactive)
+				//Log.i(TAG, "coundown to restart: "+countdowntorestart);
+				countdowntorestart--;
+				if(countdowntorestart<0)
 				{
-					if(!ct.isWaitingForSubscription() && !ct.active() && !ct.contextSupported())
-					{
-						ct.subscribe();
-					}
-					if(ct.contextSupported() && !ct.active() && ct!=null)
-					{
-						//Log.i(TAG, ct.getName()+" totally should start." + " However it is already subscribed, which is a problem.");
-						ct.unsubscribe();
-					}
-					
-				}
-				if(ct.active())
-				{
-					ct.requestContextUpdateIfNeeded();
+					//Log.i(TAG, "restart");
+					countdowntorestart=1;
+					//restart all servers (which right now is just one)
+					ManagerManager.startServer("Dynamix");
 				}
 			}
-
-			
+			//check if we have any outstanding subscriptions. This can be seen by the fact, that  the shared preferences say, the type has been activated but
+			//the context type does not support that.
+			if(DynamixConnectionService.isConnected())
+			{
+				//Log.i(TAG, "dynamix is connected");
+				//OK, we seem to have a connected Dynmix
+				Set<String> keyset = contexttypes.keySet();
+				Iterator<String> it = keyset.iterator();
+				while(it.hasNext())
+				{
+					String key = it.next();
+					boolean shouldbeactive= prefs.getBoolean(key, false);
+					ContextType ct = contexttypes.get(key);
+					if(shouldbeactive)
+					{
+						if(!ct.isWaitingForSubscription() && !ct.active() && !ct.contextSupported())
+						{
+							ct.subscribe();
+						}
+						if(ct.contextSupported() && !ct.active() && ct!=null)
+						{
+							//Log.i(TAG, ct.getName()+" totally should start." + " However it is already subscribed, which is a problem.");
+							ct.unsubscribe();
+						}
+						
+					}
+					if(ct.active())
+					{
+						ct.requestContextUpdateIfNeeded();
+					}
+				}
+	
+				
+			}
+			else
+			{
+				Log.i(TAG, "dynamix is not connected");
+			}
+			new Thread(new Runnable() 
+	        {
+	            public void run() 
+	            {
+	        		//TODO: Update descriptions of context and stuff...
+	            	Iterator<String> itx = contexttypes.keySet().iterator();
+	            	while(itx.hasNext())
+	            	{
+	            		ContextType ct = contexttypes.get(itx.next());
+	            		if(ct.getDescription().equals("") || littlecounter==60)
+	            		{
+	            			//now, download the description and probably some other stuff from the thing
+	            			updateDetail(ct);
+	            		}
+	            		littlecounter++;
+	            	}
+	            }
+	        }).start();
 		}
 		else
 		{
-			Log.i(TAG, "dynamix is not connected");
+			Log.e(TAG, "nope, IP is still not found.");
 		}
-		new Thread(new Runnable() 
-        {
-            public void run() 
-            {
-        		//TODO: Update descriptions of context and stuff...
-            	Iterator<String> itx = contexttypes.keySet().iterator();
-            	while(itx.hasNext())
-            	{
-            		ContextType ct = contexttypes.get(itx.next());
-            		if(ct.getDescription().equals("") || littlecounter==60)
-            		{
-            			//now, download the description and probably some other stuff from the thing
-            			updateDetail(ct);
-            		}
-            		littlecounter++;
-            	}
-            }
-        }).start();
 		scheduleNext();
 	}
 	

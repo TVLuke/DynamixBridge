@@ -194,7 +194,7 @@ public class HTTPServerManager extends Service
 			    			Log.d(TAG, "HTTP for "+type.getName());
 			    			s.uri(type.getName().replace(".", "/"), new HTTPDynamixControler(type, type.getUpdateIntervall()))
 			    			.action("read", HttpMethod.GET)
-			    			.action("create", HttpMethod.PUT)
+			    			.action("update", HttpMethod.POST)
 			    			.defaultFormat(Format.XML)
 			    			.noSerialization();
 			    			if(!type.getName().endsWith(".man"))

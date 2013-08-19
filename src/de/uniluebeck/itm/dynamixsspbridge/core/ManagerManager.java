@@ -527,12 +527,12 @@ public class ManagerManager extends Service
 
 	public static void updateToReleventEvent(ContextType contexttype, Bundle scanConfig) 
 	{
+		int counter=0;
 		if(contexttype.getCurrentEvent()!=null)
 		{
 			Date d = new Date();
 			if(contexttype.getCurrentEvent().getExpireMills()<d.getTime())
 			{
-				int counter=0;
 				String rid = contexttype.getCurrentEvent().getResponseId();
 				contexttype.requestConfiguredContextUpdate(scanConfig);
 				while(rid.equals(contexttype.getCurrentEvent().getResponseId()) && counter<200)
@@ -554,7 +554,7 @@ public class ManagerManager extends Service
 		else
 		{
 			contexttype.requestConfiguredContextUpdate(scanConfig);
-			while(!(contexttype.getCurrentEvent()!=null))
+			while(!(contexttype.getCurrentEvent()!=null) && counter<50)
 			{
 				//wait
 				try 
@@ -566,6 +566,7 @@ public class ManagerManager extends Service
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				  }
+				counter++;
 			  } 
 		  }
 	}

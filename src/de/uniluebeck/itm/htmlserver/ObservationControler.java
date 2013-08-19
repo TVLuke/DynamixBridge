@@ -53,6 +53,7 @@ public class ObservationControler
 		String payload = new String(ba);
 		//Bundle scanConfig = ManagerManager.parseRequest(payload);
 		//ManagerManager.updateToReleventEvent(contexttype, scanConfig);
+		Log.d(TAG, "getall");
 		final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
         ContextType type = (ContextType)contexttypes.get(payload);
         if(type!=null)
@@ -78,6 +79,11 @@ public class ObservationControler
 	{
 		Log.i(TAG, " ObservationControler GET");
 		String format = request.getFormat();
+		Log.d(TAG, "requested Format = "+format);
+		if(!(format!=null))
+		{
+			format=Format.XML;
+		}
 		Log.d(TAG, "requested Format = "+format);
 		byte[] r = ManagerManager.createContextTypeListResponse(format);
 		response.setResponseStatus(HttpResponseStatus.OK);
