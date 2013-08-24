@@ -59,6 +59,9 @@ public class HTTPDynamixControler
 		if(format.equals(Format.TXT))
 		{
 			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype);
+			response.setContentType(Format.TXT);
+			response.setBody(new String(r));			
+			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{

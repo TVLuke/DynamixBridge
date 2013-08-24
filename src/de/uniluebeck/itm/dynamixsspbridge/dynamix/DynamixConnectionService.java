@@ -50,6 +50,7 @@ public class DynamixConnectionService extends Service
 {
 
 	private static String TAG ="SSPBridge";
+	public static DynamixConnectionService ctx;
 	private static IDynamixFacade dynamix;
 
 	private static ConcurrentHashMap<String, ContextType> allContextTypes =  new ConcurrentHashMap<String, ContextType>();
@@ -64,6 +65,7 @@ public class DynamixConnectionService extends Service
 	public void onCreate() 
 	{
 		super.onCreate();
+		ctx=this;
 		 Log.e(TAG, "bla");
 	}
 	
@@ -72,33 +74,37 @@ public class DynamixConnectionService extends Service
 	{
 		super.onStartCommand(intent, flags, startId);
 		Log.i(TAG, "bla2");
-			if (dynamix == null) 
-			{
-				bindService(new Intent(IDynamixFacade.class.getName()), sConnection, Context.BIND_AUTO_CREATE);
-				Log.i(TAG, "A1 - Connecting to Dynamix...");
-			} 
-			else 
-			{
-				try 
-				{
-					if (!dynamix.isSessionOpen()) 
-					{
-						Log.i(TAG, "Dynamix connected... trying to open session");
-						dynamix.openSession();
-					} 
-					else
-					{
-						Log.i(TAG, "Session is already open");
-					}
-				} 
-				catch (RemoteException e) 
-				{
-					Log.e(TAG, e.toString());
-				}
-			}
+		dynamixconnectandbind();
 		return START_STICKY;
 	}
 	
+	private void dynamixconnectandbind()
+	{
+		if (dynamix == null) 
+		{
+			bindService(new Intent(IDynamixFacade.class.getName()), sConnection, Context.BIND_AUTO_CREATE);
+			Log.i(TAG, "A1 - Connecting to Dynamix...");
+		} 
+		else 
+		{
+			try 
+			{
+				if (!dynamix.isSessionOpen()) 
+				{
+					Log.i(TAG, "Dynamix connected... trying to open session");
+					dynamix.openSession();
+				} 
+				else
+				{
+					Log.i(TAG, "Session is already open");
+				}
+			} 
+			catch (RemoteException e) 
+			{
+				Log.e(TAG, e.toString());
+			}
+		}
+	}
     @Override
 	public void onDestroy() 
     {
@@ -418,7 +424,7 @@ public class DynamixConnectionService extends Service
 				else
 				{
 					Log.d(TAG, "dynamix session not open");
-			}
+				}
 			}
 			catch (RemoteException e) 
 			{
@@ -429,6 +435,10 @@ public class DynamixConnectionService extends Service
 		else
 		{
 			Log.d(TAG, "dynamix=null");
+			if(ctx!=null)
+			{
+				ctx.dynamixconnectandbind();
+			}
 		}
 		//Log.d(TAG, "proove="+ct.getName());
 		return allContextTypes;
@@ -461,6 +471,10 @@ public class DynamixConnectionService extends Service
 		else
 		{
 			Log.d(TAG, "dynamix=null");
+			if(ctx!=null)
+			{
+				ctx.dynamixconnectandbind();
+			}
 		}
 	}
 	
@@ -487,7 +501,12 @@ public class DynamixConnectionService extends Service
 		}
 		else
 		{
+			contexttype.contextsupportremoved();	
 			Log.d(TAG, "dynamix=null");
+			if(ctx!=null)
+			{
+				ctx.dynamixconnectandbind();
+			}
 		}
 	}
 	
@@ -534,6 +553,13 @@ public class DynamixConnectionService extends Service
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+		}
+		else
+		{			
+			if(ctx!=null)
+			{
+				ctx.dynamixconnectandbind();
 			}
 		}
 		return false;

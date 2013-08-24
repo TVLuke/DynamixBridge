@@ -102,6 +102,30 @@ public class HTTPServerManager extends Service
 					.action("create", HttpMethod.PUT)
 					.defaultFormat(Format.XML)
 					.noSerialization();
+					//TODO: this is a capitulation on the limits of the implementation of RestExpress... shit man.
+					ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
+					for(int j=0; j<types.size(); j++)
+			    	{
+			    		String key = (String) types.keySet().toArray()[j];
+			    		ContextType type = types.get(key);
+			    		if(true)
+			    		{
+			    			Log.d(TAG, "HTTP for "+type.getName());
+			    			s.uri(type.getName().replace(".", "/"), new HTTPDynamixControler(type, type.getUpdateIntervall()))
+			    			.action("read", HttpMethod.GET)
+			    			.action("update", HttpMethod.POST)
+			    			.defaultFormat(Format.XML)
+			    			.noSerialization();
+			    			if(!type.getName().endsWith(".man"))
+			    			{
+			    				s.uri("/"+type.getManType().getName().replace(".", "/")+"/man", new HTTPDynamixControler(type.getManType(), type.getUpdateIntervall()))
+			    				.action("read", HttpMethod.GET)
+			    				.action("create", HttpMethod.PUT)
+			    				.defaultFormat(Format.XML)
+			    				.noSerialization();
+			    			}
+			    		}
+			    	}
 					try
 					{
 						s.bind();
@@ -145,7 +169,7 @@ public class HTTPServerManager extends Service
 		}
 	}
 	
-	public static void addService(ContextType contexttype, int updateintervall)
+	public static void addService(final ContextType contexttype, final int updateintervall)
 	{
 		Log.d(TAG, "add Service");
 		Log.d(TAG, "serverList size="+serverList.size());
@@ -154,21 +178,26 @@ public class HTTPServerManager extends Service
 			@Override
 			public void run()
 			{
+				/**int port = 8081;
 				for(int i=0; i<serverList.size(); i++)
 				{
 					RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
+					port = s.getPort();
 					Log.d(TAG, "1");
+					//s.setName(s.getName());					
+					Log.d(TAG, "1b");
 					s.shutdown();
+					//s.shutdown(); //this sometimes blocks the entire progress
 					Log.d(TAG, "2");
-				}
-				for(int i=0; i<serverList.size(); i++)
+				}**/
+				/**for(int i=0; i<serverList.size(); i++)
 				{
 					Log.d(TAG, "3");
 					RestExpress s = serverList.get((String) (serverList.keySet().toArray()[i]));
 					Log.d(TAG, "4");
 					String servername = s.getName();
 					Log.d(TAG, "5");
-					int port = s.getPort();
+					
 					Log.d(TAG, "6");
 					Log.d(TAG, "restarting "+servername+" at port "+port);
 					s = new RestExpress()
@@ -216,8 +245,8 @@ public class HTTPServerManager extends Service
 						Log.e(TAG, "HTTP Bind failed.");
 					}
 					s.awaitShutdown();
-					
-				}
+				}**/
+				contexttype.activate(8081 , updateintervall);
 			}
 		});
 		tt.start(); 

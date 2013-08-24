@@ -49,6 +49,8 @@ public class ContextType
 	private ContextTypeStatus status= ContextTypeStatus.INACTIVE;
 	private boolean deprecated=false;
 	private String redirect="";
+	private boolean httpactive=false;
+	private boolean coapactive=false;
 	
 	
 	private static enum ContextTypeStatus 
@@ -235,9 +237,20 @@ public class ContextType
 	{
 		if(status.equals(ContextTypeStatus.SUPPORTED))
 		{
-			status=ContextTypeStatus.ACTIVE;
-			updateIntervall=updateInt;
-			activatePlugins();
+			if(port==5683)
+			{
+				coapactive=true;
+			}
+			if(port==8081)
+			{
+				httpactive=true;
+			}
+			if(coapactive && httpactive)
+			{
+				status=ContextTypeStatus.ACTIVE;
+				updateIntervall=updateInt;
+				activatePlugins();
+			}
 		}
 	}
 	
@@ -256,6 +269,8 @@ public class ContextType
 			status=ContextTypeStatus.INACTIVE;
 		}
 		updateIntervall=10000;
+		coapactive=false;
+		httpactive=false;
 		observableservices.clear();
 		notobservableservices.clear();
 		httpContextTypeControler.clear();
@@ -282,8 +297,10 @@ public class ContextType
 
 	public void contextsupportremoved() 
 	{
-		ManagerManager.removeService(this);
 		status = ContextTypeStatus.INACTIVE;
+		coapactive=false;
+		httpactive=false;
+		ManagerManager.removeService(this);
 	}
 	
 	public boolean contextSupported()
