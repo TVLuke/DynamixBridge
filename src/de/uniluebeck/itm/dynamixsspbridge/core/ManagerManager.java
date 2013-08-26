@@ -64,7 +64,7 @@ public class ManagerManager extends Service
 	public void onCreate() 
 	{
 		super.onCreate();
-		 Log.e(TAG, "ManagerManager on Create");
+		 Log.d(TAG, "ManagerManager on Create");
 	}
 	
 	@Override
@@ -83,14 +83,14 @@ public class ManagerManager extends Service
 	
 	public static void startServer(String servername)
 	{
-		 Log.e(TAG, "ManagerManager startServer");
+		 Log.d(TAG, "ManagerManager startServer");
 		CoapServerManager.startServer(servername);
 		HTTPServerManager.startServer(servername);
 	}
 	
 	public static void startServer(String servername, int port)
 	{
-		 Log.e(TAG, "ManagerManager startServe");
+		 Log.d(TAG, "ManagerManager startServe");
 		
 	}
 	
@@ -109,7 +109,7 @@ public class ManagerManager extends Service
 	
 	public static void addService(ContextType contexttype, int updateintervall)
 	{
-		 Log.e(TAG, "ManagerManager addService");
+		 Log.d(TAG, "ManagerManager addService");
 
 		CoapServerManager.addService(contexttype, updateintervall);
 		HTTPServerManager.addService(contexttype, updateintervall);
@@ -118,7 +118,7 @@ public class ManagerManager extends Service
 	
 	public static void removeService(ContextType contexttype)
 	{
-		 Log.e(TAG, "ManagerManager removeService");
+		 Log.d(TAG, "ManagerManager removeService");
 
 		CoapServerManager.removeService(contexttype);
 		HTTPServerManager.removeService(contexttype);
@@ -132,10 +132,11 @@ public class ManagerManager extends Service
 	
 	public static Bundle parseRequest(String payload)
 	{
-		 Log.e(TAG, "ManagerManager parseRequest");
+		 Log.d(TAG, "ManagerManager parseRequest");
 
 		Bundle scanConfig = new Bundle();
 		payload=payload.replace("=", " ");
+		payload=payload.replace("\"","");
         StringTokenizer tk = new StringTokenizer(payload, ";;");
         ArrayList<Object> arguments = new ArrayList<Object>(); 
         while(tk.hasMoreTokens())

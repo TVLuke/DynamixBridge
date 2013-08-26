@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.PendingIntent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.common.util.concurrent.SettableFuture;
@@ -60,23 +61,56 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 	private void processPut(SettableFuture<CoapResponse> responseFuture, CoapRequest request) 
 	{
         CoapResponse response;
-        try{
+        try
+        {
             //parse new status value
             String payload = request.getPayload().toString(Charset.forName("UTF-8"));
-            Log.d(TAG, "POST: "+payload);
-
-            final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
-            ContextType type = (ContextType)contexttypes.get(payload);
-            if(type!=null)
-            {
-            	Log.d(TAG, "type!=null");
-            	NotificationService.requestContext(payload);
-	            response = new CoapResponse(Code.CHANGED_204);
-	            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
-	            response.setContentType(MediaType.TEXT_PLAIN_UTF8);
-
-	            responseFuture.set(response);
-            }
+            Log.d(TAG, "PUT: "+payload);
+            Bundle scanConfig = ManagerManager.parseRequest(payload);
+            if(scanConfig.containsKey("action_type"))
+    		{
+            	Log.d(TAG, "PUT contains action_type");
+            	Log.d(TAG, scanConfig.getString("action_type"));
+    			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))
+    			{
+    				Log.d(TAG, "PUT subscribe and contains context_type");
+    				String ctype = scanConfig.getString("context_type");
+    				Log.d(TAG, scanConfig.getString("context_type"));
+    				Log.d(TAG, ctype);
+    				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+    				ContextType type = (ContextType)contexttypes.get(ctype);
+		            if(type!=null)
+		            {
+		            	Log.d(TAG, "type!=null");
+		            	NotificationService.requestContext(ctype);
+			            response = new CoapResponse(Code.CHANGED_204);
+			            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
+			            response.setContentType(MediaType.TEXT_PLAIN_UTF8);
+		
+			            responseFuture.set(response);
+		            }
+		            else
+		            {
+		            	Log.d(TAG, "type==null");
+		            }
+    			}
+    			if(scanConfig.getString("action_type").equals("unsubscribe") && scanConfig.containsKey("context_type"))
+    			{
+    				String ctype = scanConfig.getString("context_type");
+    				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+    				ContextType type = (ContextType)contexttypes.get(ctype);
+		            if(type!=null)
+		            {
+		            	Log.d(TAG, "type!=null");
+		            	NotificationService.requestUnsubscribeContext(ctype);
+			            response = new CoapResponse(Code.CHANGED_204);
+			            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
+			            response.setContentType(MediaType.TEXT_PLAIN_UTF8);
+		
+			            responseFuture.set(response);
+		            }
+    			}
+    		}
             //create response
 
 

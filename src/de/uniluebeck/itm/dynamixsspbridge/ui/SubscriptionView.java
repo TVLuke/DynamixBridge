@@ -163,12 +163,18 @@ public class SubscriptionView extends Activity
 		public void run() 
     	{
     		//Log.d(TAG, "updater main View");
-    		list =UpdateManager.getContextTypes();
-    		//Log.e(TAG, "IP : "+UpdateManager.getIP());
-    		TextView coapip = (TextView) findViewById(R.id.coapip);
-    		coapip.setText("IP: "+UpdateManager.getIP());
-    		//adapter.notifyDataSetInvalidated();
-    		adapter.notifyDataSetChanged();
+    		SubscriptionView.this.runOnUiThread(new Runnable()
+    		{
+    		    public void run()
+    		    {
+    	    		list =UpdateManager.getContextTypes();
+    	    		//Log.e(TAG, "IP : "+UpdateManager.getIP());
+    	    		TextView coapip = (TextView) findViewById(R.id.coapip);
+    	    		coapip.setText("IP: "+UpdateManager.getIP());
+    	    		//adapter.notifyDataSetInvalidated();
+    	    		adapter.notifyDataSetChanged();
+    		    }
+    		});
 
 	        handler.removeCallbacks(this); // remove the old callback
 	        handler.postDelayed(this, delay); // register a new one

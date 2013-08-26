@@ -10,6 +10,7 @@
     <string name="subscribetoplugins">Subscribe To Plug Ins</string>
     <string name="updateintervall">Update OIntervall (in seconds)</string>
     <string name="youhavereceived">You have been requested to subscribe to this context and submit data into the internet of things.</string>
+    <string name="youhavereceived2">You have been requested to unsubscribe from this context.</string>
     <string name="address">Address:</string>
 
 </resources>

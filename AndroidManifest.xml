@@ -26,9 +26,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView"></activity>
-        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextSubscriptionRequested"></activity>
+       </activity>
+       <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView"></activity>
+       <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextSubscriptionRequested"></activity>
+       <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextUnsubscriptionRequested"></activity>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService"></service>
        <service android:name="de.uniluebeck.itm.coapserver.ManagerManager"></service>
        <service android:name="de.uniluebeck.itm.coapserver.CoapServerManager"></service>

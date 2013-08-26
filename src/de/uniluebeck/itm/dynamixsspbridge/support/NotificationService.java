@@ -20,6 +20,7 @@ import org.ambientdynamix.api.application.IDynamixFacade;
 
 import de.uniluebeck.itm.dynamixsspbridge.R;
 import de.uniluebeck.itm.dynamixsspbridge.ui.ContextSubscriptionRequested;
+import de.uniluebeck.itm.dynamixsspbridge.ui.ContextUnsubscriptionRequested;
 import de.uniluebeck.itm.dynamixsspbridge.ui.SubscriptionView;
 
 import android.app.Notification;
@@ -63,6 +64,7 @@ public class NotificationService extends Service
 			Log.d(TAG, "ctx!=null");
 			NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE); 
 			notificationManager.cancel(id);
+			notificationManager.cancelAll();
 			Intent intent = new Intent(ctx,SubscriptionView.class);
 			PendingIntent pIntent = PendingIntent.getActivity(ctx, id, intent, 0);
 			Notification noti = new Notification.Builder(ctx)
@@ -85,6 +87,7 @@ public class NotificationService extends Service
 		super.onDestroy();
 		NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE); 
 		notificationManager.cancel(id);
+		notificationManager.cancelAll();
 	}
 	
 	public static void requestContext(String payload) 
@@ -116,5 +119,35 @@ public class NotificationService extends Service
 			notificationManager.notify(id, noti); 
 		}
 		
+	}
+
+	public static void requestUnsubscribeContext(String payload) 
+	{
+		Log.d(TAG, "blabla2="+payload);
+		if(ctx!=null)
+		{
+			id++;
+			Log.d(TAG, "ctx!=null");
+			NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(NOTIFICATION_SERVICE); 
+			Intent intent = new Intent(ctx, ContextUnsubscriptionRequested.class);
+			intent.putExtra("contexttype", payload);
+			Log.d(TAG, intent.getStringExtra("contexttype"));
+			PendingIntent pIntent = PendingIntent.getActivity(ctx, id, intent, 0);
+			Notification noti = new Notification.Builder(ctx)
+	        .setContentTitle("Request for Context Subscription")
+	        .setContentText(payload)
+	        .setSmallIcon(R.drawable.notification)
+	        .setContentIntent(pIntent).build();
+			Log.d(TAG, "flag");
+			noti.flags |= Notification.FLAG_AUTO_CANCEL;
+			noti.flags |= Notification.FLAG_SHOW_LIGHTS;
+			noti.ledARGB=0xffffffff; //color, in this case, white
+			noti.ledOnMS=1000; //light on in milliseconds
+			noti.ledOffMS=4000; //light off in milliseconds
+			noti.defaults |= Notification.DEFAULT_SOUND;
+			noti.defaults |= Notification.DEFAULT_VIBRATE;
+			Log.d(TAG, "go:");
+			notificationManager.notify(id, noti); 
+		}
 	}
 }

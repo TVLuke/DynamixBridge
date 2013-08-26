@@ -51,21 +51,43 @@ public class ObservationControler
 		ChannelBuffer body = request.getBody();
 		byte[] ba = body.array();
 		String payload = new String(ba);
-		//Bundle scanConfig = ManagerManager.parseRequest(payload);
-		//ManagerManager.updateToReleventEvent(contexttype, scanConfig);
-		Log.d(TAG, "getall");
-		final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
-        ContextType type = (ContextType)contexttypes.get(payload);
-        if(type!=null)
-        {
-           	Log.d(TAG, "type!=null");
-           	NotificationService.requestContext(payload);
-           	response.setResponseStatus(HttpResponseStatus.CREATED);
-        }
-        else
-        {
-        	response.setResponseStatus(HttpResponseStatus.NOT_FOUND);
-        }
+		Bundle scanConfig = ManagerManager.parseRequest(payload);
+		if(scanConfig.containsKey("action_type"))
+		{
+			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))
+			{
+				String ctype = scanConfig.getString("context_type");
+				Log.d(TAG, "getall");
+				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+		        ContextType type = (ContextType)contexttypes.get(ctype);
+		        if(type!=null)
+		        {
+		           	Log.d(TAG, "type!=null");
+		           	NotificationService.requestContext(ctype);
+		           	response.setResponseStatus(HttpResponseStatus.CREATED);
+		        }
+		        else
+		        {
+		        	response.setResponseStatus(HttpResponseStatus.NOT_FOUND);
+		        }
+			}
+			if(scanConfig.getString("action_type").equals("unsubscribe") && scanConfig.containsKey("context_type"))
+			{
+				String ctype = scanConfig.getString("context_type");
+				Log.d(TAG, "getall");
+				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+		        ContextType type = (ContextType)contexttypes.get(ctype);
+		        if(type!=null)
+		        {
+		           	NotificationService.requestUnsubscribeContext(ctype);
+		           	response.setResponseStatus(HttpResponseStatus.CREATED);
+		        }
+		        else
+		        {
+		        	response.setResponseStatus(HttpResponseStatus.NOT_FOUND);
+		        }
+			}
+		}
 	}
 
 	public String delete(Request request, Response response)

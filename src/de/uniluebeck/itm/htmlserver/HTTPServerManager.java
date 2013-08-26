@@ -90,6 +90,12 @@ public class HTTPServerManager extends Service
 				@Override
 				public void run()
 				{
+					UpdateManager.updateList();
+					ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
+					while(types.size()<1)//needed for the workaround... otherwise the server starts before any context types are known. Even this only kind of works.
+					{
+						types = UpdateManager.getContextTypes();
+					}
 					RestExpress s = new RestExpress()
 					.setName(servername)
 				    .setPort(port)
@@ -97,13 +103,14 @@ public class HTTPServerManager extends Service
 				    .putResponseProcessor(Format.JSON, ResponseProcessors.json())
 				    .putResponseProcessor(Format.XML, ResponseProcessors.xml());
 					serverList.put(servername, s);
-					s.uri("/contexttypes", new ObservationControler())
+					s.uri("/service/dynamix/contexttypes", new ObservationControler())
 					.action("read", HttpMethod.GET)
 					.action("create", HttpMethod.PUT)
 					.defaultFormat(Format.XML)
 					.noSerialization();
 					//TODO: this is a capitulation on the limits of the implementation of RestExpress... shit man.
-					ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
+					types = UpdateManager.getContextTypes();
+					Log.d(TAG, "HTTP "+types.size()+" go.");
 					for(int j=0; j<types.size(); j++)
 			    	{
 			    		String key = (String) types.keySet().toArray()[j];
@@ -254,7 +261,7 @@ public class HTTPServerManager extends Service
 	
 	public static void removeService(ContextType contexttype)
 	{
-		RestExpress s = serverList.get((String) (serverList.keySet().toArray()[0]));
-		s.uri("/"+contexttype.getName().replace(".", "/"), null);
+		//RestExpress s = serverList.get((String) (serverList.keySet().toArray()[0]));
+		//s.uri("/"+contexttype.getName().replace(".", "/"), null);
 	}
 }

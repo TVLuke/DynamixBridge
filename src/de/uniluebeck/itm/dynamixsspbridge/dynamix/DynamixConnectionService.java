@@ -531,12 +531,12 @@ public class DynamixConnectionService extends Service
 		{
 			String id = plugin.getId();
 			Log.d(TAG, "configured dynamixcallback with "+id+" for "+contexttype.getName()+ " and a bundle.");
-			scanConfig.putString("Action_Type", "setcolor");
 			dynamix.configuredContextRequest(dynamixCallback, id, contexttype.getName(), scanConfig);
 		} 
 		catch (RemoteException e) 
 		{
 			// TODO Auto-generated catch block
+			Log.e(TAG, "requesting configured context triggered an exception");
 			e.printStackTrace();
 		}
 	}
