@@ -56,7 +56,10 @@ public class ObservationControler
 		{
 			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))
 			{
+				Log.d(TAG, "PUT subscribe and contains context_type");
 				String ctype = scanConfig.getString("context_type");
+				Log.d(TAG, scanConfig.getString("context_type"));
+				Log.d(TAG, ctype);
 				Log.d(TAG, "getall");
 				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
 		        ContextType type = (ContextType)contexttypes.get(ctype);
@@ -68,12 +71,16 @@ public class ObservationControler
 		        }
 		        else
 		        {
+		        	Log.d(TAG, "type==null");
 		        	response.setResponseStatus(HttpResponseStatus.NOT_FOUND);
 		        }
 			}
 			if(scanConfig.getString("action_type").equals("unsubscribe") && scanConfig.containsKey("context_type"))
 			{
+				Log.d(TAG, "PUT subscribe and contains context_type");
 				String ctype = scanConfig.getString("context_type");
+				Log.d(TAG, scanConfig.getString("context_type"));
+				Log.d(TAG, ctype);
 				Log.d(TAG, "getall");
 				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
 		        ContextType type = (ContextType)contexttypes.get(ctype);
