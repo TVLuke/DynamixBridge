@@ -311,9 +311,14 @@ public class DynamixConnectionService extends Service
 			{
 				Log.i(TAG, "A1 - Event does not expire");
 			}
-			/*
-			 * To illustrate how string-based context representations are accessed, we log each contained in the event.
-			 */
+			if (event.hasIContextInfo()) 
+			{
+				Log.i(TAG, "A1 - Event contains native IContextInfo: " + event.getIContextInfo());
+			}
+			else
+			{
+				Log.i(TAG, "A1 - NO CONTEXT INFO");
+			}
 			for (String format : event.getStringRepresentationFormats()) 
 			{
 				Log.i(TAG,
@@ -360,6 +365,21 @@ public class DynamixConnectionService extends Service
 		public void onContextPluginError(ContextPluginInformation plug, String message) throws RemoteException 
 		{
 			Log.i(TAG, "A1 - onContextPluginError for " + plug + " with message " + message);
+		}
+
+		@Override
+		public void onContextPluginDisabled(ContextPluginInformation arg0)
+				throws RemoteException 
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onContextPluginEnabled(ContextPluginInformation arg0)
+				throws RemoteException {
+			// TODO Auto-generated method stub
+			
 		}
 	};
 

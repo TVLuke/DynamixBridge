@@ -78,7 +78,6 @@ public class HTTPDynamixControler
 	public void update(Request request, Response response)
 	{
 		Log.i(TAG, " ObservationControler POST");
-		response.setResponseCreated();
 		String format = request.getFormat();
 		Log.d(TAG, "requested Format = "+format);
 		//BODY
@@ -91,6 +90,26 @@ public class HTTPDynamixControler
 		scanConfig = ManagerManager.parseRequest(payload); 
 		Log.d(TAG, "x");
 	    ManagerManager.updateToReleventEvent(contexttype, scanConfig);
+		if(!(format!=null))
+		{
+			format=Format.TXT;
+		}
+		if(format.equals(Format.TXT))
+		{
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype);
+			response.setContentType(Format.TXT);
+			response.setBody(new String(r));			
+			response.setResponseCreated();
+		}
+		if(format.equals(Format.XML))
+		{
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype);
+			response.setContentType(Format.XML);
+			response.addHeader("version", "1.0");
+			response.setResponseProcessor(ResponseProcessors.xml());
+			response.setBody(new String(r));			
+			response.setResponseCreated();
+		}
 	    Log.d(TAG, "y");
 		response.setResponseStatus(HttpResponseStatus.ACCEPTED);
 		Log.d(TAG, "z");

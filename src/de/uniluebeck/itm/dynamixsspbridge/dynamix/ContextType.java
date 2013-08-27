@@ -323,7 +323,7 @@ public class ContextType
 	
 	public void unsubscribe()
 	{
-		if(status.equals(ContextTypeStatus.SUPPORTED) || status.equals(ContextTypeStatus.ACTIVE))
+		if(status.equals(ContextTypeStatus.SUPPORTED) || status.equals(ContextTypeStatus.ACTIVE) || status.equals(ContextTypeStatus.WAITINGFORSUPPORT))
 		{
 			deactivate();
 			DynamixConnectionService.unsubscribeToContext(this);

@@ -69,7 +69,6 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	private ContextType contexttype;
 	private int updateintervall=10000;
 	private static Date d = new Date();
-	private static int counter=0;
 	private static long sumofdelays=0;
 	
 	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
@@ -85,68 +84,9 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		this.contexttype=contexttype;
 		contexttype.registerForUpdates(this);
 		Log.d(TAG, "new Service has been established for "+contexttype.getName());
-		//TODO: to be deleted
-		if(contexttype.getName().equals("org.ambientdynamix.contextplugins.context.info.sample.ping"))
-		{
-			//createRequest();
-		}
+
 	}
 	
-	//TODO to be deleted
-	private void createRequest()
-	{
-		Log.d(TAG, "test Coap Client will be created.");
-		CoapClientApplication client = new CoapClientApplication();
-		try 
-		{
-			if(counter<100)
-			{
-				Log.d(TAG, "try");
-				URI targetURI = new URI ("coap://10.0.1.14:5683/org/ambientdynamix/contextplugins/context/info/sample/ping");
-				CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.POST, targetURI);
-				String payload ="String id=x"+counter;
-				counter++;
-				coapRequest.setPayload(payload.getBytes(Charset.forName("UTF-8")));
-				d = new Date();
-				client.writeCoapRequest(coapRequest, new ResponseProcessor());
-			}
-			else
-			{
-				
-			}
-		} 
-		catch (URISyntaxException e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e(TAG, "error 1");
-			e.printStackTrace();
-		} 
-		catch (InvalidMessageException e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e(TAG, "error 2");
-			e.printStackTrace();
-		} 
-		catch (ToManyOptionsException e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e(TAG, "error 3");
-			e.printStackTrace();
-		} 
-		catch (InvalidOptionException e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e(TAG, "error 4");
-			e.printStackTrace();
-		} 
-		catch (MessageDoesNotAllowPayloadException e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e(TAG, "error 5");
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void shutdown() 
 	{

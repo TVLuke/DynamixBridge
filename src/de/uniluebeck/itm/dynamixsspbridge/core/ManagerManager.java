@@ -18,14 +18,17 @@ package de.uniluebeck.itm.dynamixsspbridge.core;
 
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.*;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ambientdynamix.api.application.ContextEvent;
+import org.ambientdynamix.api.application.IContextInfo;
 
 import android.app.Service;
 import android.content.Intent;
@@ -600,22 +603,116 @@ public class ManagerManager extends Service
         	
     		if(dif1>0)
     		{
-    			
-		    	Log.d(TAG, "mediatype="+mediaType);
+				Set<String> formats = event.getStringRepresentationFormats();
+				if(event.hasIContextInfo())
+				{
+					Log.d(TAG, "!!!!!!!!!!!!!!!!!! !!!!!");
+					IContextInfo icontextinfo = event.getIContextInfo();
+					Class myclass = icontextinfo.getClass();
+					String className = myclass.getName();
+					Log.d(TAG, "classname="+ className);
+					Method[] methods = myclass.getMethods();
+					for(Method method : methods)
+					{
+					    Log.d(TAG, "method = " + method.getName());
+					}
+				}
+				else
+				{
+					Log.d(TAG, "does not have IcontextInfo");
+					if(event instanceof IContextInfo)
+					{
+						Log.d(TAG, "but it is an instance of IContextInfo... so, there is that.");
+					}
+				}
+		    	Log.d(TAG, "mediatype="+mediaType);				
 				if(mediaType==APP_XML)
 				{
 					Log.d(TAG, "formatxml");
-					StringBuffer payload = new StringBuffer();
-					payload.append(event.getStringRepresentation("XML"));
-					return payload.toString().getBytes(Charset.forName("UTF-8"));
+					if(formats.contains("XML"))
+					{
+						Log.d(TAG, "formats contained xml...");
+						StringBuffer payload = new StringBuffer();
+						String xmldata = event.getStringRepresentation("XML");
+						//TODO: here be some wrapping
+						String xmlresult =  "<contextEvent>\n" +
+											"	<contextType>\n" +
+											"		<id>" +event.getContextType() + "</id>\n"+
+											"		<createdAt>"+event.getTimeStamp().getTime()+"</createdAt>\n"+
+											"		<expires>"+event.expires()+"</expires>"+
+											"		<expiresAt>"+event.getExpireTime().getTime()+"</expiresAt>\n"+
+											"		<source>\n"+
+											"			<plugin>\n"+
+											"				<pluginId>"+event.getEventSource().getPluginId()+"</pluginId>\n"+
+											"				<pluginName>"+event.getEventSource().getPluginName()+"</pluginName>\n"+
+											"			</plugin>\n"+
+											//TODO here should be stuff on source in terms of hardware and such things... but this requeres the app to have the jar types...
+											"		</source>\n"+
+											"	</contextType>\n" +
+											"	<contextData>\n";
+											if(event.getStringRepresentation("XML").endsWith("\n"))
+											{
+												xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		");
+											}
+											else
+											{
+												xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		")+"\n";
+											}
+											xmlresult=xmlresult+"	</contextData>\n"+
+											"</contextEvent>";
+						payload.append(xmlresult);
+						return payload.toString().getBytes(Charset.forName("UTF-8"));
+					}
+					else
+					{
+						
+					}
 				}
 				if(mediaType == TEXT_PLAIN_UTF8)
 				{
 					Log.d(TAG, "format is Plain Stuff");
-					String payload =event.getStringRepresentation("text/plain"); 
-					Log.d(TAG, payload);
-					return payload.getBytes(Charset.forName("UTF-8"));
+					if(formats.contains("text/plain"))
+					{
+						String payload =event.getStringRepresentation("text/plain"); 
+						Log.d(TAG, payload);
+						return payload.getBytes(Charset.forName("UTF-8"));
+					}
 				}
+				if(mediaType == APP_JSON)
+				{
+					Log.d(TAG, "format is JSON");
+					if(formats.contains("JSON"))
+					{
+						
+					}
+					else
+					{
+						
+
+					}
+				}
+				if(mediaType == APP_N3)
+				{
+					if(formats.contains("N3"))
+					{
+						
+					}
+				}
+				if(mediaType== APP_TURTLE)
+				{
+					if(formats.contains("Turtle"))
+					{
+						
+					}
+				}
+				if(mediaType == APP_SHDT)
+				{
+					if(formats.contains("SHDT"))
+					{
+						
+					}
+				}
+					
     		}
     		else
     		{
