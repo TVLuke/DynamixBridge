@@ -165,6 +165,10 @@ public class ManagerManager extends Service
 	            		{
 	            			argumentsArray[counter]=tk2.nextToken();
 	            			Log.d(TAG, argumentsArray[counter]);
+	            			if(counter>2)
+	            			{
+	            				argumentsArray[2]=argumentsArray[2]+" "+argumentsArray[counter];
+	            			}
 	            			counter++;
 	            		}
             		}
@@ -473,7 +477,7 @@ public class ManagerManager extends Service
 	            		if(argumentsArray[0].equals("String"))
 	            		{
 	            			argumentsArray[2]=argumentsArray[2].trim();
-	            			scanConfig.putString(argumentsArray[1], argumentsArray[2]);
+	            			scanConfig.putString(argumentsArray[1],argumentsArray[2]);
 	            		}
 	            		if(argumentsArray[0].equals("int"))
 	            		{

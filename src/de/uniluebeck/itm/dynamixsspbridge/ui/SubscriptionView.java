@@ -17,6 +17,7 @@
 package de.uniluebeck.itm.dynamixsspbridge.ui;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -73,6 +74,7 @@ public class SubscriptionView extends Activity
 		UpdateManager.updateList();
 		list =UpdateManager.getContextTypes();
         adapter =  new ContextTypeListViewAdapter(ctx, list);
+        //TODO: here I should sort this stuff
         lv.setAdapter(adapter); 
         adapter.notifyDataSetChanged();
 		Button button1 = (Button) findViewById(R.id.button1);
