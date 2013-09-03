@@ -58,14 +58,14 @@ public class HTTPDynamixControler
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false);
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());
@@ -87,23 +87,24 @@ public class HTTPDynamixControler
 		Log.d(TAG, "getall");
 		Log.d(TAG, payload);
 		Bundle scanConfig = new Bundle();
-		scanConfig = ManagerManager.parseRequest(payload); 
+		scanConfig = ManagerManager.parseRequest(payload);
 		Log.d(TAG, "x");
 	    ManagerManager.updateToReleventEvent(contexttype, scanConfig);
+	    //TODO: if Bundle contains a command to compres only transmit the dif between this status and the previous one.
 		if(!(format!=null))
 		{
 			format=Format.TXT;
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false);
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());

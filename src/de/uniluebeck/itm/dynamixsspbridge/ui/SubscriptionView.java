@@ -172,7 +172,7 @@ public class SubscriptionView extends Activity
     	    		list =UpdateManager.getContextTypes();
     	    		//Log.e(TAG, "IP : "+UpdateManager.getIP());
     	    		TextView coapip = (TextView) findViewById(R.id.coapip);
-    	    		coapip.setText("IP: "+UpdateManager.getIP());
+    	    		coapip.setText("IP: "+UpdateManager.getIP()+" ");
     	    		//adapter.notifyDataSetInvalidated();
     	    		adapter.notifyDataSetChanged();
     		    }

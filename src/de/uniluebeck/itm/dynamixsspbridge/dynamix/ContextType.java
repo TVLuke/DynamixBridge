@@ -41,6 +41,7 @@ public class ContextType
 	private String description;
 	private String shortDescription="";
 	private ContextEvent currentEvent=null;
+	private ContextEvent previousEvent=null;
 	private ArrayList<ObservableDynamixWebservice> observableservices = new ArrayList<ObservableDynamixWebservice>();
 	private ArrayList<NotObservableDynamixWebservice> notobservableservices = new ArrayList<NotObservableDynamixWebservice>();
 	private ArrayList<HTTPDynamixControler> httpContextTypeControler = new ArrayList<HTTPDynamixControler>();
@@ -110,9 +111,15 @@ public class ContextType
 		return currentEvent;
 	}
 	
+	public ContextEvent getPreviousEvent()
+	{
+		return previousEvent;
+	}
+	
 	public void setCurrentEvent(ContextEvent event)
 	{
 		Log.d(TAG, "update for "+name);
+		previousEvent = currentEvent;
 		currentEvent = event;
 		for(int i=0; i<observableservices.size(); i++)
 		{
@@ -262,7 +269,8 @@ public class ContextType
 		}
 		else if(status.equals(ContextTypeStatus.WAITINGFORSUPPORT))
 		{
-			
+			deactivate();
+			DynamixConnectionService.unsubscribeToContext(this);
 		}
 		else
 		{

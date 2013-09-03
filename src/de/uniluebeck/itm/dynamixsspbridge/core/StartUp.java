@@ -31,7 +31,7 @@ public class StartUp  extends BroadcastReceiver
 	{
 		try
 	    {
-			Log.d(TAG, "startreceiver");
+			Log.d(TAG, "startreceiver ");
 	        Intent myIntent = new Intent (context, StartService.class );
 	        context.startService(myIntent);
 	    }

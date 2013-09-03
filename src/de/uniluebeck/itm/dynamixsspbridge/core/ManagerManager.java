@@ -44,6 +44,7 @@ import de.uniluebeck.itm.htmlserver.HTTPServerManager;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
+import difflib.DiffUtils;
 
 /**
  * With more then only coap being suported we actually need to have a unified interface for all the Managers and then check which 
@@ -579,11 +580,10 @@ public class ManagerManager extends Service
 		  }
 	}
 	
-	public static byte[] createPayloadFromAcutualStatus(MediaType mediaType, ContextType contexttype)
+	public static String createStringPayloadFromAcutualStatus(MediaType mediaType, ContextEvent event)
 	{
 		Log.d(TAG, "payload from actual status");
     	Date d = new Date();
-    	ContextEvent event = contexttype.getCurrentEvent();
     	if(event!=null)
     	{
         	Log.d(TAG, "expire time "+event.getExpireTime().getTime());
@@ -608,27 +608,6 @@ public class ManagerManager extends Service
     		if(dif1>0)
     		{
 				Set<String> formats = event.getStringRepresentationFormats();
-				if(event.hasIContextInfo())
-				{
-					Log.d(TAG, "!!!!!!!!!!!!!!!!!! !!!!!");
-					IContextInfo icontextinfo = event.getIContextInfo();
-					Class myclass = icontextinfo.getClass();
-					String className = myclass.getName();
-					Log.d(TAG, "classname="+ className);
-					Method[] methods = myclass.getMethods();
-					for(Method method : methods)
-					{
-					    Log.d(TAG, "method = " + method.getName());
-					}
-				}
-				else
-				{
-					Log.d(TAG, "does not have IcontextInfo");
-					if(event instanceof IContextInfo)
-					{
-						Log.d(TAG, "but it is an instance of IContextInfo... so, there is that.");
-					}
-				}
 		    	Log.d(TAG, "mediatype="+mediaType);				
 				if(mediaType==APP_XML)
 				{
@@ -665,7 +644,7 @@ public class ManagerManager extends Service
 											xmlresult=xmlresult+"	</contextData>\n"+
 											"</contextEvent>";
 						payload.append(xmlresult);
-						return payload.toString().getBytes(Charset.forName("UTF-8"));
+						return payload.toString();
 					}
 					else
 					{
@@ -679,7 +658,7 @@ public class ManagerManager extends Service
 					{
 						String payload =event.getStringRepresentation("text/plain"); 
 						Log.d(TAG, payload);
-						return payload.getBytes(Charset.forName("UTF-8"));
+						return payload.toString();
 					}
 				}
 				if(mediaType == APP_JSON)
@@ -721,28 +700,36 @@ public class ManagerManager extends Service
     		else
     		{
 				Log.d(TAG, "event has expired");
-				contexttype.requestContextUpdate();
 				String payload =event.getStringRepresentation("text/plain"); 
 				payload="event has expired, but just in case you care... "+payload;
-				return payload.getBytes(Charset.forName("UTF-8"));
+				return payload.toString();
     		}
     	}
 		else
 		{
 			Log.d(TAG, "random old stuff");
-			if(contexttype!=null)
-			{
-				contexttype.requestContextUpdate();
-			}
-			else
-			{
-				Log.d(TAG, "contexttype=null");
-			}
 			Log.d(TAG, "requested update");
 			String payload =" "; 
-			return payload.getBytes(Charset.forName("UTF-8"));
+			return payload.toString();
 		}
 		return null;
+	}
+	
+	public static byte[] createPayloadFromAcutualStatus(MediaType mediaType, ContextType contextType, boolean compress)
+	{
+		if(compress)
+		{
+			//TRying to use https://code.google.com/p/java-diff-utils/
+			String payload1 = createStringPayloadFromAcutualStatus(mediaType, contextType.getPreviousEvent());
+			String payload2 = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent());
+			//DiffUtils.diff(payload1, payload2);
+			return "".getBytes(Charset.forName("UTF-8"));
+		}
+		else
+		{
+			String payload = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent());
+			return payload.getBytes(Charset.forName("UTF-8"));
+		}
 	}
 	
 	public static byte[] createContextTypeListResponse(String format)

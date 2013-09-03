@@ -160,7 +160,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		        {
 		        	Log.d(TAG, "accept optioon is empty");
 		            response = new CoapResponse(Code.CONTENT_205);
-		            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype));
+		            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false));
 		            response.setContentType(TEXT_PLAIN_UTF8);
 		            responseFuture.set(response);
 		        }
@@ -169,7 +169,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		        {
 		            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
 		            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
-		            byte[] payloadx = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype);
+		            byte[] payloadx = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
 		            //the requested mediatype is supported
 		            if(payloadx != null)
 		            {
@@ -199,7 +199,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	        {
 	        	Log.d(TAG, "accept optioon is empty");
 	            CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype));
+	            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false));
 	            response.setContentType(TEXT_PLAIN_UTF8);
 	            responseFuture.set(response);
 	        }
@@ -207,7 +207,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	        for(Option option : request.getOption(OptionName.ACCEPT)){
 	            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
 	            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
-	            byte[] payload = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype);
+	            byte[] payload = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
 	
 	            //the requested mediatype is supported
 	            if(payload != null)
@@ -234,7 +234,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
    	@Override
 	public byte[] getSerializedResourceStatus(MediaType mediaType) throws MediaTypeNotSupportedException 
 	{
-		return ManagerManager.createPayloadFromAcutualStatus(mediaType, contexttype);
+		return ManagerManager.createPayloadFromAcutualStatus(mediaType, contexttype, false);
 	}
 	
    	//TODO to be deleted later on... just for one testing stuff.

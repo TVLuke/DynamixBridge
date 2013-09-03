@@ -16,9 +16,6 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.dynamix;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -28,14 +25,11 @@ import org.ambientdynamix.api.application.ContextEvent;
 import org.ambientdynamix.api.application.ContextPluginInformation;
 import org.ambientdynamix.api.application.ContextPluginInformationResult;
 import org.ambientdynamix.api.application.ContextSupportInfo;
+import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
+import org.ambientdynamix.contextplugins.context.info.sample.IPingContextInfo;
 
-import de.uniluebeck.itm.coapserver.CoapServerManager;
-import de.uniluebeck.itm.dynamixsspbridge.ui.SubscriptionView;
-
-
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -318,6 +312,32 @@ public class DynamixConnectionService extends Service
 			else
 			{
 				Log.i(TAG, "A1 - NO CONTEXT INFO");
+			}
+			try
+			{
+				Log.i(TAG, "A1 try some stuff");
+				Object nativeInfo = event.getIContextInfo();
+				Log.i(TAG, "A1 got native");
+				if(nativeInfo!=null)
+				{
+					Log.i(TAG, "A1 and ist not even null");
+				}
+				else
+				{
+					Log.i(TAG, "A1 oh its null");
+				}
+				if(IPingContextInfo.class.isAssignableFrom(nativeInfo.getClass()))
+				{
+					Log.i(TAG, "PING!!!!");
+				}
+				else
+				{
+					Log.i(TAG, "Not PING");
+				}
+			}
+			catch(Exception e)
+			{
+				Log.e(TAG, "A1 - Not of any context type known to the Library. Or whatever.");
 			}
 			for (String format : event.getStringRepresentationFormats()) 
 			{

@@ -86,7 +86,7 @@ public class UpdateManager extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent) 
 	{
-		//Log.i(TAG, "updatemanager handle");
+		Log.i(TAG, "updatemanager handle");
 		//get the needed lists and variables in
 		SharedPreferences prefs = getSharedPreferences(PREFS, 0);
 		contexttypes = DynamixConnectionService.updateContextTypes();
@@ -361,14 +361,14 @@ public class UpdateManager extends IntentService
 		catch (JDOMException e) 
 		{
 			// TODO Auto-generated catch block
-			Log.e(TAG, e.getMessage());
-			e.printStackTrace();
+			//Log.e(TAG, e.getMessage());
+			//e.printStackTrace();
 		} 
 		catch (IOException e) 
 		{
 			// TODO Auto-generated catch block
-			Log.e(TAG, e.getMessage());
-			e.printStackTrace();
+			//Log.e(TAG, e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 	
