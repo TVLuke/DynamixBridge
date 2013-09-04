@@ -14,6 +14,13 @@
 	        <id>itm-maven-repository-releases-site</id>
 			<url>https://maven.itm.uni-luebeck.de/content/repositories/releases/</url>
 	    </repository>
+	    <repository>
+	       <id>4thline-repo</id>
+	       <url>http://4thline.org/m2</url>
+	       <snapshots>
+	           <enabled>false</enabled>
+	       </snapshots>
+   		</repository>
 	</repositories> 
 
     <dependencies>
@@ -84,7 +91,7 @@
 		    <groupId>com.googlecode.java-diff-utils</groupId>
 		    <artifactId>diffutils</artifactId>
 		    <version>1.2.1</version>
-		</dependency>
+		</dependency>	  
     </dependencies>
     
     <build>
