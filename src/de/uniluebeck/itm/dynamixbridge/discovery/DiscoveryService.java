@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.dynamixbridge.discovery.internal;
+package de.uniluebeck.itm.dynamixbridge.discovery;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.coapclient;
+package de.uniluebeck.itm.dynamixbridge.ssp;
 
 import java.net.URI;
 

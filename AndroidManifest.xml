@@ -40,7 +40,8 @@
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.support.NotificationService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager"></service>
-       <service android:name="de.uniluebeck.itm.dynamixbridge.discovery.internal.DiscoveryService"></service>
+       <service android:name="de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService"></service>
+       <service android:name="de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient"></service>
        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl"/>
        
        <receiver android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartUp">
