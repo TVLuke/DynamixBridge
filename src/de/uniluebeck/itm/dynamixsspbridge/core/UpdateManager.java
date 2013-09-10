@@ -32,6 +32,7 @@ import org.jdom.input.SAXBuilder;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.Utils;
+import de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
@@ -150,6 +151,7 @@ public class UpdateManager extends IntentService
 					countdowntorestart=1;
 					//restart all servers (which right now is just one)
 					ManagerManager.startServer("Dynamix");
+					startService(new Intent(this, DiscoveryService.class));
 				}
 			}
 			//check if we have any outstanding subscriptions. This can be seen by the fact, that  the shared preferences say, the type has been activated but
