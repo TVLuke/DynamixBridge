@@ -313,32 +313,6 @@ public class DynamixConnectionService extends Service
 			{
 				Log.i(TAG, "A1 - NO CONTEXT INFO");
 			}
-			try
-			{
-				Log.i(TAG, "A1 try some stuff");
-				Object nativeInfo = event.getIContextInfo();
-				Log.i(TAG, "A1 got native");
-				if(nativeInfo!=null)
-				{
-					Log.i(TAG, "A1 and ist not even null");
-				}
-				else
-				{
-					Log.i(TAG, "A1 oh its null");
-				}
-				if(IPingContextInfo.class.isAssignableFrom(nativeInfo.getClass()))
-				{
-					Log.i(TAG, "PING!!!!");
-				}
-				else
-				{
-					Log.i(TAG, "Not PING");
-				}
-			}
-			catch(Exception e)
-			{
-				Log.e(TAG, "A1 - Not of any context type known to the Library. Or whatever.");
-			}
 			for (String format : event.getStringRepresentationFormats()) 
 			{
 				Log.i(TAG,
@@ -552,8 +526,10 @@ public class DynamixConnectionService extends Service
 	
 	public static void requestContext(ContextType contexttype, ContextPlugin plugin)
 	{
+		Log.d(TAG, "DynamixConnectionService, request");
 		try 
 		{
+			Log.d(TAG, "try");
 			Log.d(TAG, "dynamixcallback with "+plugin.getId()+" for "+contexttype.getName());
 			dynamix.contextRequest(dynamixCallback, plugin.getId(), contexttype.getName());
 		} 

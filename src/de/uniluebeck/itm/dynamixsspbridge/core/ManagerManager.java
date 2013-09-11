@@ -580,7 +580,7 @@ public class ManagerManager extends Service
 		  }
 	}
 	
-	public static String createStringPayloadFromAcutualStatus(MediaType mediaType, ContextEvent event)
+	public static String createStringPayloadFromAcutualStatus(MediaType mediaType, ContextEvent event, ContextType contexttype)
 	{
 		Log.d(TAG, "payload from actual status");
     	Date d = new Date();
@@ -709,6 +709,7 @@ public class ManagerManager extends Service
 		{
 			Log.d(TAG, "random old stuff");
 			Log.d(TAG, "requested update");
+			contexttype.requestContextUpdateIfNeeded();
 			String payload =" "; 
 			return payload.toString();
 		}
@@ -720,14 +721,14 @@ public class ManagerManager extends Service
 		if(compress)
 		{
 			//TRying to use https://code.google.com/p/java-diff-utils/
-			String payload1 = createStringPayloadFromAcutualStatus(mediaType, contextType.getPreviousEvent());
-			String payload2 = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent());
+			String payload1 = createStringPayloadFromAcutualStatus(mediaType, contextType.getPreviousEvent(), contextType);
+			String payload2 = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent(), contextType);
 			//DiffUtils.diff(payload1, payload2);
 			return "".getBytes(Charset.forName("UTF-8"));
 		}
 		else
 		{
-			String payload = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent());
+			String payload = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent(), contextType);
 			return payload.getBytes(Charset.forName("UTF-8"));
 		}
 	}

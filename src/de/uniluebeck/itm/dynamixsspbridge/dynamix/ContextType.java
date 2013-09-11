@@ -188,6 +188,10 @@ public class ContextType
 				requestContextUpdate();
 			}
 		}
+		else
+		{
+			requestContextUpdate();
+		}
 	}
 
 	public void activatePlugins() 
