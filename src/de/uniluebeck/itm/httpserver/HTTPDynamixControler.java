@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.uniluebeck.itm.htmlserver;
+package de.uniluebeck.itm.httpserver;
 
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package de.uniluebeck.itm.htmlserver;
+package de.uniluebeck.itm.httpserver;
 
 import java.util.HashMap;
 import java.util.Iterator;

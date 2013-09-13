@@ -36,7 +36,7 @@
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService"></service>
        <service android:name="de.uniluebeck.itm.coapserver.ManagerManager"></service>
        <service android:name="de.uniluebeck.itm.coapserver.CoapServerManager"></service>
-       <service android:name="de.uniluebeck.itm.htmlserver.HTTPServerManager"></service>
+       <service android:name="de.uniluebeck.itm.httpserver.HTTPServerManager"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.support.NotificationService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager"></service>

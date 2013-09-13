@@ -26,7 +26,7 @@ import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
-import de.uniluebeck.itm.htmlserver.HTTPDynamixControler;
+import de.uniluebeck.itm.httpserver.HTTPDynamixControler;
 
 import android.os.Bundle;
 import android.util.Log;

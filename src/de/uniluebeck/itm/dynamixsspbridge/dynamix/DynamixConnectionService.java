@@ -311,7 +311,7 @@ public class DynamixConnectionService extends Service
 			}
 			else
 			{
-				Log.i(TAG, "A1 - NO CONTEXT INFO");
+				Log.i(TAG, "A1 - NO CONTEXT INFO ");
 			}
 			for (String format : event.getStringRepresentationFormats()) 
 			{

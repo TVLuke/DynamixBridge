@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.htmlserver;
+package de.uniluebeck.itm.httpserver;
 
 import java.util.Date;
 

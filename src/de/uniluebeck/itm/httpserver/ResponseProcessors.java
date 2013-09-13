@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-package de.uniluebeck.itm.htmlserver;
+package de.uniluebeck.itm.httpserver;
 
 import android.util.Log;
 

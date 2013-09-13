@@ -64,7 +64,7 @@ public class ContextItemView extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contextitemview);
-		Log.d(TAG, "ok, oncreat");
+		Log.d(TAG, "ok oncreat");
         ctx=this;
         final SharedPreferences prefs = ctx.getSharedPreferences(PREFS, 0);
         Intent i = getIntent();

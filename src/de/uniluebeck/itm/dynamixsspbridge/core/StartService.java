@@ -20,7 +20,7 @@ import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
-import de.uniluebeck.itm.htmlserver.HTTPServerManager;
+import de.uniluebeck.itm.httpserver.HTTPServerManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;

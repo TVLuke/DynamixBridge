@@ -76,7 +76,7 @@ public class CoapServerManager extends Service
 
 	public static void startServer(String servername, int port)
 	{
-		Log.d(TAG, "Start server "+servername);
+		Log.d(TAG, "Start Server "+servername);
 		try
 		{
 			DynamixCoapServer server = new DynamixCoapServer();
@@ -160,21 +160,23 @@ public class CoapServerManager extends Service
 				try
 				{
 					s.registerService(new ObservableDynamixWebservice(contexttype, updateintervall));
+					//Log.d(TAG, "next line");
+					contexttype.activate(s.getServerPort(), updateintervall);
+					//Log.d(TAG, "next line2");
+					if(!contexttype.getName().endsWith(".man"))
+					{
+						//Log.d(TAG, "in the if");
+						s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
+						//Log.d(TAG, "still");
+						contexttype.getManType().activate(s.getServerPort(), updateintervall);
+					}
 				}
 				catch(Exception e)
 				{
 					Log.e(TAG, "was get da bitte?");
+					removeService(contexttype);
 				}
-				//Log.d(TAG, "next line");
-				contexttype.activate(s.getServerPort(), updateintervall);
-				//Log.d(TAG, "next line2");
-				if(!contexttype.getName().endsWith(".man"))
-				{
-					//Log.d(TAG, "in the if");
-					s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
-					//Log.d(TAG, "still");
-					contexttype.getManType().activate(s.getServerPort(), updateintervall);
-				}
+				
 				//Log.d(TAG, "whatup");
 				//Log.d(TAG, "done");
 			}

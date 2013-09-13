@@ -40,7 +40,7 @@ import com.strategicgains.restexpress.RestExpress;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.htmlserver.HTTPServerManager;
+import de.uniluebeck.itm.httpserver.HTTPServerManager;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
@@ -622,7 +622,7 @@ public class ManagerManager extends Service
 											"	<contextType>\n" +
 											"		<id>" +event.getContextType() + "</id>\n"+
 											"		<createdAt>"+event.getTimeStamp().getTime()+"</createdAt>\n"+
-											"		<expires>"+event.expires()+"</expires>"+
+											"		<expires>"+event.expires()+"</expires>\n"+
 											"		<expiresAt>"+event.getExpireTime().getTime()+"</expiresAt>\n"+
 											"		<source>\n"+
 											"			<plugin>\n"+

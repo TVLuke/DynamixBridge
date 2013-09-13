@@ -77,7 +77,8 @@ public class DiscoveryService extends Service
 
 	    // The name is subject to change based on conflicts
 	    // with other services advertised on the same network.
-	    serviceInfo.setServiceName("DynamixBridge");
+	    
+	    serviceInfo.setServiceName("DynamixBridge_"+port);
 	    serviceInfo.setServiceType("_http._tcp.");
 	    serviceInfo.setPort(port);
 	    
