@@ -60,7 +60,7 @@ public class DynamixConnectionService extends Service
 	{
 		super.onCreate();
 		ctx=this;
-		 Log.e(TAG, "bla");
+		Log.e(TAG, "bla");
 	}
 	
 	@Override
