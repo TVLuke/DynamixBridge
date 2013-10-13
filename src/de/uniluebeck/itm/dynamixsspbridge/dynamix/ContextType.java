@@ -26,6 +26,7 @@ import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
+import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPDynamixControler;
 
 import android.os.Bundle;
@@ -248,11 +249,11 @@ public class ContextType
 	{
 		if(status.equals(ContextTypeStatus.SUPPORTED))
 		{
-			if(port==5683)
+			if(port==Constants.COAP_PORT)
 			{
 				coapactive=true;
 			}
-			if(port==8081)
+			if(port==Constants.HTTP_PORT)
 			{
 				httpactive=true;
 			}

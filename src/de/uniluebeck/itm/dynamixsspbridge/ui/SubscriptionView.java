@@ -16,12 +16,6 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.ui;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
@@ -40,6 +34,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -77,34 +74,6 @@ public class SubscriptionView extends Activity
         //TODO: here I should sort this stuff
         lv.setAdapter(adapter); 
         adapter.notifyDataSetChanged();
-		Button button1 = (Button) findViewById(R.id.button1);
-		button1.setOnClickListener(new OnClickListener() 
-		{
-			@Override
-			public void onClick(View v) 
-			{
-				//Log.i(TAG, "KLICK");
-				try
-				{
-						UpdateManager.updateList();
-				}
-				catch(Exception e)
-				{
-					//blablabla concurent modification and stuff
-				}
-				list = UpdateManager.getContextTypes();
-				if(list!=null)
-				{
-					adapter.notifyDataSetChanged();
-					//Log.d(TAG, "List not null..."+list.size());
-			
-				}
-				else
-				{
-					Log.d(TAG, "list is null");
-				}
-			}
-		});
         lv.setOnItemClickListener(new OnItemClickListener() 
         {
        	 
@@ -155,7 +124,53 @@ public class SubscriptionView extends Activity
 		
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main_activity_actions, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) 
+	    {
+	        case R.id.action_update:
+	        	try
+				{
+						UpdateManager.updateList();
+				}
+				catch(Exception e)
+				{
+					//blablabla concurent modification and stuff
+				}
+				list = UpdateManager.getContextTypes();
+				if(list!=null)
+				{
+					adapter.notifyDataSetChanged();
+					//Log.d(TAG, "List not null..."+list.size());
+			
+				}
+				else
+				{
+					Log.d(TAG, "list is null");
+				}
+	            return true;
+	        case R.id.action_list:
+	            //TODO
+	            return true;
+	        case R.id.action_key:
+	            //TODO
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
 	private class  UIUpdater implements Runnable
 	{
     	private Handler handler = new Handler();

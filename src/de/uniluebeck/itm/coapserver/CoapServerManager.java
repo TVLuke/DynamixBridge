@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.uniluebeck.itm.dynamixsspbridge.core.IServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
+import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
 import android.app.Service;
@@ -70,7 +71,7 @@ public class CoapServerManager extends Service
 
 	public static void startServer(String servername)
 	{
-		startServer(servername, 5683);
+		startServer(servername, Constants.COAP_PORT);
 	}
 	
 
@@ -79,7 +80,7 @@ public class CoapServerManager extends Service
 		Log.d(TAG, "Start Server "+servername);
 		try
 		{
-			DynamixCoapServer server = new DynamixCoapServer();
+			DynamixCoapServer server = new DynamixCoapServer(port);
 			Log.d(TAG, "Server started and listening on port " + server.getServerPort());
 			server.registerService(new NotObservableOverviewWebService("/service/dynamix/contexttypes"," "));
 			serverList.put("s1", server);

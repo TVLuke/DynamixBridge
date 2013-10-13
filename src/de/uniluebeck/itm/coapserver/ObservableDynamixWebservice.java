@@ -16,18 +16,11 @@
 
 package de.uniluebeck.itm.coapserver;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -39,26 +32,13 @@ import android.util.Log;
 import com.google.common.util.concurrent.SettableFuture;
 
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
-import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
-import de.uniluebeck.itm.ncoap.application.client.CoapClientApplication;
-import de.uniluebeck.itm.ncoap.application.client.CoapResponseProcessor;
 import de.uniluebeck.itm.ncoap.application.server.webservice.MediaTypeNotSupportedException;
 import de.uniluebeck.itm.ncoap.application.server.webservice.ObservableWebService;
-import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.EmptyAcknowledgementProcessor;
-import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalEmptyAcknowledgementReceivedMessage;
-import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalRetransmissionTimeoutMessage;
-import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.RetransmissionTimeoutProcessor;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
-import de.uniluebeck.itm.ncoap.message.InvalidMessageException;
-import de.uniluebeck.itm.ncoap.message.MessageDoesNotAllowPayloadException;
 import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.header.MsgType;
-import de.uniluebeck.itm.ncoap.message.options.InvalidOptionException;
 import de.uniluebeck.itm.ncoap.message.options.Option;
-import de.uniluebeck.itm.ncoap.message.options.ToManyOptionsException;
 import de.uniluebeck.itm.ncoap.message.options.UintOption;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
@@ -68,8 +48,6 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	private static String TAG ="SSPBridge";
 	private ContextType contexttype;
 	private int updateintervall=10000;
-	private static Date d = new Date();
-	private static long sumofdelays=0;
 	
 	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
 	{
@@ -237,43 +215,4 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		return ManagerManager.createPayloadFromAcutualStatus(mediaType, contexttype, false);
 	}
 	
-   	//TODO to be deleted later on... just for one testing stuff.
-	private class ResponseProcessor  implements CoapResponseProcessor, EmptyAcknowledgementProcessor, RetransmissionTimeoutProcessor 
-	{
-
-		@Override
-		public void processEmptyAcknowledgement(InternalEmptyAcknowledgementReceivedMessage message) 
-		{
-			//Log.d(TAG, "got one");
-			//createRequest();
-		}
-
-		@Override
-		public void processCoapResponse(CoapResponse coapResponse) 
-		{
-			Date d2 = new Date();
-			long x = d2.getTime()-d.getTime();
-			Log.d(TAG, "got one "+x+" ms");
-			sumofdelays=sumofdelays+x;
-			Log.d(TAG, "sum of delays="+sumofdelays);
-			try 
-			{
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e) 
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			//createRequest();
-		}
-
-		@Override
-		public void processRetransmissionTimeout(InternalRetransmissionTimeoutMessage timeoutMessage) 
-		{
-			//Log.d(TAG, "got one");
-			//createRequest();
-		}
-		
-	}
 }

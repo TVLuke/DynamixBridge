@@ -40,6 +40,7 @@ import com.strategicgains.restexpress.RestExpress;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
+import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPServerManager;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
@@ -766,8 +767,8 @@ public class ManagerManager extends Service
 	    		 if(type.active())
 	    		 {
 	    			 payload=payload+"     <url>\n";
-	    			 payload=payload+"         <http>http://"+UpdateManager.getIP()+":8081/"+type.getName().replace(".", "/")+"</http>\n";
-	    			 payload=payload+"         <coap>coap://"+UpdateManager.getIP()+":5683/"+type.getName().replace(".", "/")+"</coap>\n";
+	    			 payload=payload+"         <http>http://"+UpdateManager.getIP()+":"+Constants.HTTP_PORT+"/"+type.getName().replace(".", "/")+"</http>\n";
+	    			 payload=payload+"         <coap>coap://"+UpdateManager.getIP()+":"+Constants.COAP_PORT+"/"+type.getName().replace(".", "/")+"</coap>\n";
 	    			 payload=payload+"     </url>\n";
 	    		 }
 	    		 payload=payload+"  </contexttype>\n";

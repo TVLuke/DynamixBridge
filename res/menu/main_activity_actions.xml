@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto" >
+      
+    <item android:id="@+id/action_update"
+          android:icon="@drawable/recycle"
+          android:title="@string/update"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_list"
+          android:icon="@drawable/list"
+          android:title="@string/update"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_key"
+          android:icon="@drawable/key"
+          android:title="@string/update"
+          android:showAsAction="ifRoom"/>
+</menu>

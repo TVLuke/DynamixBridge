@@ -33,6 +33,7 @@ import de.uniluebeck.itm.coapserver.DynamixCoapServer;
 import de.uniluebeck.itm.coapserver.NotObservableOverviewWebService;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
+import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
 
 import android.app.Service;
@@ -77,7 +78,7 @@ public class HTTPServerManager extends Service
 	
 	public static void startServer(String servername)
 	{
-		startServer(servername, 8081);
+		startServer(servername, Constants.HTTP_PORT);
 	}
 	
 	public static void startServer(final String servername, final int port)
@@ -253,7 +254,7 @@ public class HTTPServerManager extends Service
 					}
 					s.awaitShutdown();
 				}**/
-				contexttype.activate(8081 , updateintervall);
+				contexttype.activate(Constants.HTTP_PORT, updateintervall);
 			}
 		});
 		tt.start(); 

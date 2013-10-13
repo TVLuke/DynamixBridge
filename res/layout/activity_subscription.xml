@@ -18,11 +18,12 @@
         android:layout_height="20dp"
         android:text="" />
 
-    <Button
-        android:id="@+id/button1"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="match_parent"
-        android:layout_height="49dp"
-        android:text="@string/update" />
+        android:layout_height="20dp"
+        android:background="#FF9955"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ListView
         android:id="@+id/listView1"

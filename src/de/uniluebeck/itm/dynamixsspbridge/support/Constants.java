@@ -19,4 +19,6 @@ package de.uniluebeck.itm.dynamixsspbridge.support;
 public class Constants {
 
 	public static final String PREFS = "CoAPDynamixBridgePreferences";
+	public static final int COAP_PORT = 8082;
+	public static final int HTTP_PORT = 8081;
 }
