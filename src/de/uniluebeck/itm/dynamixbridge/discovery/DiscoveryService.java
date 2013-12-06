@@ -32,9 +32,9 @@ public class DiscoveryService extends Service
 {
 
 	ServerSocket mServerSocket;
-	RegistrationListener mRegistrationListener;
+	static RegistrationListener mRegistrationListener;
 	String mServiceName;
-	NsdManager mNsdManager;
+	static NsdManager mNsdManager;
 	private final String TAG ="SSPBridge";
 	
 	@Override
@@ -149,7 +149,7 @@ public class DiscoveryService extends Service
 	}
 	
 	 // NsdHelper's tearDown method
-    public void tearDown() 
+    public static void tearDown() 
     {
     	mNsdManager.unregisterService(mRegistrationListener);
     }

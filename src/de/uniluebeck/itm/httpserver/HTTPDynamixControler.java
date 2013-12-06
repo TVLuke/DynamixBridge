@@ -31,6 +31,7 @@ import com.strategicgains.restexpress.Response;
 
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
+import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 
 public class HTTPDynamixControler 
 {
@@ -103,7 +104,21 @@ public class HTTPDynamixControler
 		Log.d(TAG, "getall");
 		Log.d(TAG, payload);
 		Bundle scanConfig = new Bundle();
-		scanConfig = ManagerManager.parseRequest(payload);
+		String f = request.getFormat();
+		MediaType mt = null;
+		if(f.equals(Format.TXT))
+		{
+			mt = MediaType.TEXT_PLAIN_UTF8;
+		}
+		if(f.equals(Format.JSON))
+		{
+			mt = MediaType.APP_JSON;
+		}
+		if(f.equals(Format.XML))
+		{
+			mt = MediaType.APP_XML;
+		}
+		scanConfig = ManagerManager.parseRequest(payload, mt);
 		Log.d(TAG, "x");
 	    ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 	    //TODO: if Bundle contains a command to compres only transmit the dif between this status and the previous one.

@@ -126,8 +126,9 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
         Bundle scanConfig = new Bundle();
         //parse new status value
         String payload = request.getPayload().toString(Charset.forName("UTF-8"));
+        MediaType requestMediaType =  request.getContentType();
         Log.d(TAG, "POST: "+payload);
-        scanConfig = ManagerManager.parseRequest(payload);    
+        scanConfig = ManagerManager.parseRequest(payload, requestMediaType);    
         ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 
 		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);

@@ -18,11 +18,17 @@ package de.uniluebeck.itm.dynamixsspbridge.core;
 
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +42,17 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.json.parsers.JSONParser;
+import com.json.parsers.JsonParserFactory;
 import com.strategicgains.restexpress.RestExpress;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
@@ -45,6 +62,7 @@ import de.uniluebeck.itm.httpserver.HTTPServerManager;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
+import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
 import difflib.DiffUtils;
 
 /**
@@ -135,10 +153,348 @@ public class ManagerManager extends Service
 		return "";
 	}
 	
-	public static Bundle parseRequest(String payload)
+	public static boolean validateRequest(Bundle xyz)
 	{
-		 Log.d(TAG, "ManagerManager parseRequest");
+		return false;
+	}
+	
+	public static Bundle parseRequest(String payload, MediaType type)
+	{
+		Log.d(TAG, "ManagerManager parseRequest");
+		if(type == MediaType.TEXT_PLAIN_UTF8)
+		{
+			Log.d(TAG, "MediaType Plain Text");
+			//return parseJSONRequest(payload);
+			return parsePlainTextRequest(payload);
+		}
+		if(type == MediaType.APP_JSON)
+		{
+			Log.d(TAG, "MediaType JSON");
+			return parseJSONRequest(payload);
+		}
+		if(type == MediaType.APP_XML)
+		{
+			Log.d(TAG, "MediaType XML");
+			return parseXMLRequest(payload);
+		}
+		return null;
+	}
+	
+	private static Bundle parseXMLRequest(String payload)
+	{
+		Bundle scanConfig = new Bundle();
+		//THIS DOES NOT WORK YET
+		return scanConfig;
+	}
 
+	private static Bundle parseJSONRequest(String payload)
+	{
+		Log.d(TAG, "parse JSON Request");
+		Bundle scanConfig = new Bundle();
+		//DO STUFF
+		JsonParserFactory factory=JsonParserFactory.getInstance();
+		JSONParser parser=factory.newJsonParser();
+		Map jsonData=parser.parseJson(payload);
+		Set keys = jsonData.keySet();
+		Iterator it = keys.iterator();
+		while(it.hasNext())
+		{
+			Object key = it.next();
+			Object x=jsonData.get(key);
+			if(x instanceof String)
+			{
+				if(key.equals("token"))
+				{
+					Log.d(TAG, "TOKEN");
+				}
+				else
+				{
+					Log.d(TAG, key+" "+x);
+				}
+			}
+			if(x instanceof HashMap)
+			{
+				System.out.println("Map");
+				HashMap m = (HashMap) x;
+				if(key.equals("boolean"))
+				{
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							boolean[] d = new boolean[da.size()];
+							System.out.print(kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								boolean b=false;
+								if(da.get(i).equals("true"))
+								{
+									b=true;
+								}
+								Log.d(TAG, b+", ");
+								d[i] = b;
+							}
+							System.out.println("]");
+							scanConfig.putBooleanArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							boolean b=false;
+							if(m.get(kk).equals("true"))
+							{
+								b=true;
+							}
+							Log.d(TAG, "BOOLEAN "+kk+" "+b);
+							scanConfig.putBoolean(kk, b);
+						}
+
+					}
+				 }
+				 if(key.equals("int"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							int[] d = new int[da.size()];
+							System.out.print(kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Integer.parseInt(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putIntArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							int i = Integer.parseInt((String) m.get(kk));
+							Log.d(TAG, "INT "+kk+" "+i);
+							scanConfig.putInt(kk, i);
+						}
+					}
+				 }
+				 if(key.equals("long"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							long[] d = new long[da.size()];
+							System.out.print(kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Long.parseLong(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putLongArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							long l = Long.parseLong((String) m.get(kk));
+							Log.d(TAG, "LONG "+kk+" "+l);
+							scanConfig.putLong(kk, l);
+						}
+					}
+				 }
+				 if(key.equals("byte"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							byte[] d = new byte[da.size()];
+							Log.d(TAG, kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Byte.parseByte(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putByteArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							byte b = Byte.parseByte((String) m.get(kk));
+							Log.d(TAG, "Byte "+kk+" "+b);
+							scanConfig.putByte(kk, b);
+						}
+					}
+				 }
+				 if(key.equals("short"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							short[] d = new short[da.size()];
+							Log.d(TAG, kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Short.parseShort(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putShortArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							short s = Short.parseShort((String) m.get(kk));
+							Log.d(TAG, "Short "+kk+" "+s);
+							scanConfig.putShort(kk, s);
+						}
+					}
+				 }
+				 if(key.equals("float"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							float[] d = new float[da.size()];
+							Log.d(TAG, kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Float.parseFloat(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putFloatArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							float f = Float.parseFloat((String) m.get(kk));
+							Log.d(TAG, "Float "+kk+" "+f);
+							scanConfig.putFloat(kk, f);
+						}
+					}
+				 }
+				 if(key.equals("double"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							double[] d = new double[da.size()];
+							Log.d(TAG, kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = Double.parseDouble(da.get(i));
+							}
+							Log.d(TAG, "]");
+							scanConfig.putDoubleArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							double d = Double.parseDouble((String) m.get(kk));
+							Log.d(TAG, "Double "+kk+" "+d);
+							scanConfig.putDouble(kk, d);
+						}
+					}
+				 }
+				 if(key.equals("String"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							Log.d(TAG, "ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							String[] d = new String[da.size()];
+							Log.d(TAG, kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								Log.d(TAG, da.get(i)+", ");
+								d[i] = da.get(i);
+							}
+							Log.d(TAG, "]");
+							scanConfig.putStringArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							String d = (String) m.get(kk);
+							Log.d(TAG, "String "+kk+" "+d);
+							scanConfig.putString(kk, d);
+						}
+					}	
+				 }
+				 if(key.equals("char"))
+				 {
+					Set kset = m.keySet();
+					Iterator it2 = kset.iterator();
+					while(it2.hasNext())
+					{
+						String kk = (String) it2.next();
+						if(m.get(kk) instanceof ArrayList)
+						{
+							System.out.println("ARRAY");
+							ArrayList<String> da = (ArrayList<String>) m.get(kk);
+							char[] d = new char[da.size()];
+							System.out.print(kk+" [");
+							for(int i=0; i<da.size(); i++)
+							{
+								System.out.print(da.get(i)+", ");
+								d[i] = da.get(i).charAt(0);
+							}
+							System.out.println("]");
+							scanConfig.putCharArray(kk, d);
+						}
+						if(m.get(kk) instanceof String)
+						{
+							char c = ((String) m.get(kk)).charAt(0);
+							System.out.println("Char "+kk+" "+c);
+							scanConfig.putChar(kk, c);
+						}
+					}
+				 }
+			 }
+		}		 
+		return scanConfig;
+	}
+	
+	
+	private static Bundle parsePlainTextRequest(String payload)
+	{
 		Bundle scanConfig = new Bundle();
 		payload=payload.replace("=", " ");
 		payload=payload.replace("\"","");
@@ -584,6 +940,7 @@ public class ManagerManager extends Service
 	public static String createStringPayloadFromAcutualStatus(MediaType mediaType, ContextEvent event, ContextType contexttype)
 	{
 		Log.d(TAG, "payload from actual status");
+		Log.d(TAG, "Mediatype: "+mediaType.toString());
     	Date d = new Date();
     	if(event!=null)
     	{
@@ -605,10 +962,13 @@ public class ManagerManager extends Service
         	Log.d(TAG, "Difference in seconds="+dif1/1000);
         	Log.d(TAG, "Difference in minutes="+(dif1/1000)/60);
         	Log.d(TAG, "Difference in hours="+((dif1/1000)/60)/60);
-        	
-    		if(dif1>0)
-    		{
-				Set<String> formats = event.getStringRepresentationFormats();
+        		Set<String> formats = event.getStringRepresentationFormats();
+        		if(mediaType==TEXT_PLAIN_UTF8)
+        		{
+        			//TODO: This is evil. And Wroooong. And Evil. And Evil.
+        			mediaType= APP_JSON;
+        		}
+        			
 		    	Log.d(TAG, "mediatype="+mediaType);				
 				if(mediaType==APP_XML)
 				{
@@ -630,7 +990,7 @@ public class ManagerManager extends Service
 											"				<pluginId>"+event.getEventSource().getPluginId()+"</pluginId>\n"+
 											"				<pluginName>"+event.getEventSource().getPluginName()+"</pluginName>\n"+
 											"			</plugin>\n"+
-											//TODO here should be stuff on source in terms of hardware and such things... but this requeres the app to have the jar types...
+														//TODO here should be stuff on source in terms of hardware and such things... but this requires the app to have the jar types...
 											"		</source>\n"+
 											"	</contextType>\n" +
 											"	<contextData>\n";
@@ -664,15 +1024,100 @@ public class ManagerManager extends Service
 				}
 				if(mediaType == APP_JSON)
 				{
+					
 					Log.d(TAG, "format is JSON");
-					if(formats.contains("JSON"))
+					if(formats.contains("RDF/JSON"))
 					{
+						Log.d(TAG, "format contains rdf/json");
 						
+						String payload =event.getStringRepresentation("RDF/JSON"); 
+						Log.d(TAG, "payload\n"+payload);
+						Model model = ModelFactory.createDefaultModel();
+						String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+						StringWriter out = new StringWriter();
+						String result ="";
+						Log.d(TAG, "step1");
+						Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_lsdtfm_2222");
+						Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_org.ambientdynamix.contextplugins.lastfm");
+						Log.d(TAG, "step2");
+						//create the Properties
+						Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasTypeID");
+						Property prop_createdAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "CreatedAt");
+						Property prop_expiration = model.createProperty("http://dynamix.org/semmodel/0.1/", "Expires");
+						Property prop_expirationAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "ExpiresAt");
+						Property prop_hasSource = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasSource");
+						Property prop_hasData = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasData");
+						Log.d(TAG, "step3");
+											
+						Property prop_pluginID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasID");
+						Property prop_pluginName= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasName");
+						
+						res_contextEvent.addProperty(prop_typeID, "org.ambientdynamix.contextplugins.context.info.environment.currentsong");
+						res_contextEvent.addProperty(prop_createdAt, "156354632164");
+						res_contextEvent.addProperty(prop_expiration, "true");
+						res_contextEvent.addProperty(prop_expirationAt, "156354635164");
+						res_contextEvent.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/ContextEvent");
+						res_contextEvent.addProperty(prop_hasSource, res_sensor);
+						
+						res_sensor.addProperty(prop_pluginID, "org.ambientdynamix.contextplugins.lastfm");
+						res_sensor.addProperty(prop_pluginName, "Lastfm Plugin");
+						
+						Model model_2 = ModelFactory.createDefaultModel();
+						Log.d(TAG, "step4");
+						InputStream stream;
+						try 
+						{
+							stream = new ByteArrayInputStream(payload.getBytes("UTF-8"));
+							model_2.read(stream, null);
+							out = new StringWriter();
+							result="";
+							model_2.write(out, syntax);
+							result = out.toString();
+						} 
+						catch (UnsupportedEncodingException e) 
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							Log.e(TAG, "unspoorted coding exeption");
+						}
+						Log.d(TAG, "step 5");
+						//System.out.println("");
+						//System.out.println("");
+						
+						ResIterator resiter = model_2.listSubjects();
+						while(resiter.hasNext())
+						{
+							Resource res = resiter.next();
+							res_contextEvent.addProperty(prop_hasData, res);
+							StmtIterator stmtIterator = res.listProperties();
+							model.add(stmtIterator);
+							while(stmtIterator.hasNext())
+							{
+								Statement stmt = stmtIterator.next();
+
+							}
+							
+						}
+						Log.d(TAG, "step 6");
+
+						syntax = "RDF/JSON"; // also try "N-TRIPLE" and "TURTLE"
+						out = new StringWriter();
+						result="";
+						model.write(out, syntax);
+						result = out.toString();
+						Log.d(TAG, result);
+						return result;
 					}
 					else
 					{
-						
-
+						if(formats.contains("JSON"))
+						{
+							
+						}
+						else
+						{
+							
+						}
 					}
 				}
 				if(mediaType == APP_N3)
@@ -696,15 +1141,6 @@ public class ManagerManager extends Service
 						
 					}
 				}
-					
-    		}
-    		else
-    		{
-				Log.d(TAG, "event has expired");
-				String payload =event.getStringRepresentation("text/plain"); 
-				payload="event has expired, but just in case you care... "+payload;
-				return payload.toString();
-    		}
     	}
 		else
 		{

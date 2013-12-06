@@ -35,6 +35,7 @@ import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
+import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 
 public class ObservationControler 
 {
@@ -51,7 +52,22 @@ public class ObservationControler
 		ChannelBuffer body = request.getBody();
 		byte[] ba = body.array();
 		String payload = new String(ba);
-		Bundle scanConfig = ManagerManager.parseRequest(payload);
+		//MediaType is strange in this lib...
+		String f = request.getFormat();
+		MediaType mt = null;
+		if(f.equals(Format.TXT))
+		{
+			mt = MediaType.TEXT_PLAIN_UTF8;
+		}
+		if(f.equals(Format.JSON))
+		{
+			mt = MediaType.APP_JSON;
+		}
+		if(f.equals(Format.XML))
+		{
+			mt = MediaType.APP_XML;
+		}
+		Bundle scanConfig = ManagerManager.parseRequest(payload, mt);
 		if(scanConfig.containsKey("action_type"))
 		{
 			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))

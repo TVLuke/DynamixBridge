@@ -18,6 +18,7 @@ package de.uniluebeck.itm.dynamixsspbridge.core;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService;
+import de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
 import de.uniluebeck.itm.httpserver.HTTPServerManager;
@@ -62,8 +63,10 @@ public class StartService extends Service
 		stopService(new Intent(this, ManagerManager.class));
 		stopService(new Intent(this, UpdateManager.class));
 		stopService(new Intent(this, NotificationService.class));
+		DiscoveryService.tearDown();
 		stopService(new Intent(this, DiscoveryService.class));
 		UpdateManager.deactivate();
+		stopService(new Intent(this, DynamixBridgeCoapClient.class));
 		running=false;
 	}
 	
@@ -84,6 +87,7 @@ public class StartService extends Service
 				startService(new Intent(this, UpdateManager.class));
 				startService(new Intent(this, NotificationService.class));
 				startService(new Intent(this, DiscoveryService.class));
+				startService(new Intent(this, DynamixBridgeCoapClient.class));
 				UpdateManager.updateList();
 			}
 			catch(Exception e)

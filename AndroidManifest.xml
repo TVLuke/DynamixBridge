@@ -33,6 +33,7 @@
        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView"></activity>
        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextSubscriptionRequested"></activity>
        <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.ContextUnsubscriptionRequested"></activity>
+       <activity android:name="de.uniluebeck.itm.dynamixsspbridge.ui.TolkenOverview"></activity>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService"></service>
        <service android:name="de.uniluebeck.itm.coapserver.ManagerManager"></service>
        <service android:name="de.uniluebeck.itm.coapserver.CoapServerManager"></service>

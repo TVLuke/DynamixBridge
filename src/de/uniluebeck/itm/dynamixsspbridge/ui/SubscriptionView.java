@@ -161,7 +161,9 @@ public class SubscriptionView extends Activity
 				}
 	            return true;
 	        case R.id.action_list:
-	            //TODO
+	        	Intent i = new Intent(this, TolkenOverview.class);
+	        	startActivity(i);
+	            //TODO start activity TolkenOv
 	            return true;
 	        case R.id.action_key:
 	            //TODO

@@ -25,6 +25,7 @@ import org.ambientdynamix.api.application.ContextEvent;
 import org.ambientdynamix.api.application.ContextPluginInformation;
 import org.ambientdynamix.api.application.ContextPluginInformationResult;
 import org.ambientdynamix.api.application.ContextSupportInfo;
+import org.ambientdynamix.api.application.ContextSupportResult;
 import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
@@ -371,6 +372,13 @@ public class DynamixConnectionService extends Service
 
 		@Override
 		public void onContextPluginEnabled(ContextPluginInformation arg0)
+				throws RemoteException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onContextSupportResult(ContextSupportResult arg0)
 				throws RemoteException {
 			// TODO Auto-generated method stub
 			

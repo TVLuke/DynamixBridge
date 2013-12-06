@@ -28,8 +28,8 @@ import de.uniluebeck.itm.ncoap.message.MessageDoesNotAllowPayloadException;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.Option;
 import de.uniluebeck.itm.ncoap.message.options.UintOption;
+import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
 import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
@@ -66,7 +66,8 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
             //parse new status value
             String payload = request.getPayload().toString(Charset.forName("UTF-8"));
             Log.d(TAG, "PUT: "+payload);
-            Bundle scanConfig = ManagerManager.parseRequest(payload);
+            MediaType requestMediaType =  request.getContentType();
+            Bundle scanConfig = ManagerManager.parseRequest(payload, requestMediaType);
             if(scanConfig.containsKey("action_type"))
     		{
             	Log.d(TAG, "PUT contains action_type");
