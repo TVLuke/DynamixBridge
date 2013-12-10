@@ -48,7 +48,7 @@ public class DynamixBridgeCoapClient extends Service
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
 		super.onStartCommand(intent, flags, startId);
-		Log.e(TAG, "START CoaP Client SERVICE");
+		Log.e(TAG, "START CoaP Client SERVICE ");
 		if(!sspIP.equals(""))
 		{
 			try

@@ -88,7 +88,7 @@ public class ManagerManager extends Service
 	public void onCreate() 
 	{
 		super.onCreate();
-		 Log.d(TAG, "ManagerManager on Create");
+		 Log.d(TAG, "ManagerManager on Create ");
 	}
 	
 	@Override
@@ -170,7 +170,14 @@ public class ManagerManager extends Service
 		if(type == MediaType.APP_JSON)
 		{
 			Log.d(TAG, "MediaType JSON");
-			return parseJSONRequest(payload);
+			if(payload.equals(""))
+			{
+				return  new Bundle();
+			}
+			else
+			{
+				return parseJSONRequest(payload);
+			}
 		}
 		if(type == MediaType.APP_XML)
 		{
@@ -966,51 +973,78 @@ public class ManagerManager extends Service
         		if(mediaType==TEXT_PLAIN_UTF8)
         		{
         			//TODO: This is evil. And Wroooong. And Evil. And Evil.
-        			mediaType= APP_JSON;
+        			mediaType= APP_XML;
         		}
         			
 		    	Log.d(TAG, "mediatype="+mediaType);				
 				if(mediaType==APP_XML)
 				{
 					Log.d(TAG, "formatxml");
-					if(formats.contains("XML"))
+					if(formats.contains("RDF/XML"))
 					{
-						Log.d(TAG, "formats contained xml...");
-						StringBuffer payload = new StringBuffer();
-						String xmldata = event.getStringRepresentation("XML");
-						//TODO: here be some wrapping
-						String xmlresult =  "<contextEvent>\n" +
-											"	<contextType>\n" +
-											"		<id>" +event.getContextType() + "</id>\n"+
-											"		<createdAt>"+event.getTimeStamp().getTime()+"</createdAt>\n"+
-											"		<expires>"+event.expires()+"</expires>\n"+
-											"		<expiresAt>"+event.getExpireTime().getTime()+"</expiresAt>\n"+
-											"		<source>\n"+
-											"			<plugin>\n"+
-											"				<pluginId>"+event.getEventSource().getPluginId()+"</pluginId>\n"+
-											"				<pluginName>"+event.getEventSource().getPluginName()+"</pluginName>\n"+
-											"			</plugin>\n"+
-														//TODO here should be stuff on source in terms of hardware and such things... but this requires the app to have the jar types...
-											"		</source>\n"+
-											"	</contextType>\n" +
-											"	<contextData>\n";
-											if(event.getStringRepresentation("XML").endsWith("\n"))
-											{
-												xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		");
-											}
-											else
-											{
-												xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		")+"\n";
-											}
-											xmlresult=xmlresult+"	</contextData>\n"+
-											"</contextEvent>";
-						payload.append(xmlresult);
-						return payload.toString();
+						Log.d(TAG, "format contains rdf/XML");
+						Model model = getSemanticInfo(event);
+						if(model!=null)
+						{
+							Log.d(TAG, "Modle is not null");
+							String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+							Log.d(TAG, "step 6b");
+							StringWriter out = new StringWriter();
+							Log.d(TAG, "step 6c");
+							String result="";
+							Log.d(TAG, "step 6d");
+							
+							model.write(out, syntax);
+							Log.d(TAG, "step 6e");
+							result = out.toString();
+							Log.d(TAG, "step 6f");
+							Log.d(TAG, result);
+							Log.d(TAG, "step 6g");
+							return result;
+						}
+						else
+						{
+							return "null";
+						}
 					}
 					else
 					{
-						
+						if(formats.contains("XML"))
+						{
+							Log.d(TAG, "formats contained xml...");
+							StringBuffer payload = new StringBuffer();
+							String xmldata = event.getStringRepresentation("XML");
+							//TODO: here be some wrapping
+							String xmlresult =  "<contextEvent>\n" +
+												"	<contextType>\n" +
+												"		<id>" +event.getContextType() + "</id>\n"+
+												"		<createdAt>"+event.getTimeStamp().getTime()+"</createdAt>\n"+
+												"		<expires>"+event.expires()+"</expires>\n"+
+												"		<expiresAt>"+event.getExpireTime().getTime()+"</expiresAt>\n"+
+												"		<source>\n"+
+												"			<plugin>\n"+
+												"				<pluginId>"+event.getEventSource().getPluginId()+"</pluginId>\n"+
+												"				<pluginName>"+event.getEventSource().getPluginName()+"</pluginName>\n"+
+												"			</plugin>\n"+
+															//TODO here should be stuff on source in terms of hardware and such things... but this requires the app to have the jar types...
+												"		</source>\n"+
+												"	</contextType>\n" +
+												"	<contextData>\n";
+												if(event.getStringRepresentation("XML").endsWith("\n"))
+												{
+													xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		");
+												}
+												else
+												{
+													xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		")+"\n";
+												}
+												xmlresult=xmlresult+"	</contextData>\n"+
+												"</contextEvent>";
+							payload.append(xmlresult);
+							return payload.toString();
+						}
 					}
+
 				}
 				if(mediaType == TEXT_PLAIN_UTF8)
 				{
@@ -1026,104 +1060,18 @@ public class ManagerManager extends Service
 				{
 					
 					Log.d(TAG, "format is JSON ");
-					if(formats.contains("RDF/JSON"))
+					if(formats.contains("RDF/XML"))
 					{
-						Log.d(TAG, "format contains rdf/json");
-						
-						String payload =event.getStringRepresentation("RDF/JSON"); 
-						
-						Log.d(TAG, "payload\n"+payload);
-						payload=payload.replace("j.0", "xx.0");
-						payload=payload.replace("j.1", "xx.1");
-						payload=payload.replace("j.2", "xx.2");
-						Log.d(TAG, "step0");
-						Model model = ModelFactory.createDefaultModel();
-						Log.d(TAG, "step0b");
-						String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
-						Log.d(TAG, "step0c");
-						StringWriter out = new StringWriter();
-						Log.d(TAG, "step0d");
-						String result ="";
-						Log.d(TAG, "step1");
-						
-						Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_"+event.getContextType()+"_"+event.getTimeStamp().getTime()+"");
-						Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_"+event.getEventSource().getPluginId()+"");
-						Log.d(TAG, "step2");
-						//create the Properties
-						Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasTypeID");
-						Property prop_createdAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "CreatedAt");
-						Property prop_expiration = model.createProperty("http://dynamix.org/semmodel/0.1/", "Expires");
-						Property prop_expirationAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "ExpiresAt");
-						Property prop_hasSource = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasSource");
-						Property prop_hasData = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasData");
-						Log.d(TAG, "step3");
-											
-						Property prop_pluginID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasID");
-						Property prop_pluginName= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasName");
-						
-						res_contextEvent.addProperty(prop_typeID, event.getContextType());
-						res_contextEvent.addProperty(prop_createdAt, ""+event.getTimeStamp().getTime());
-						
-						res_contextEvent.addProperty(prop_expiration, ""+event.expires());
-						res_contextEvent.addProperty(prop_expirationAt, ""+event.getExpireTime().getTime());
-						res_contextEvent.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/ContextEvent");
-						res_contextEvent.addProperty(prop_hasSource, res_sensor);
-						
-						res_sensor.addProperty(prop_pluginID, event.getEventSource().getPluginId());
-						res_sensor.addProperty(prop_pluginName, event.getEventSource().getPluginName());
-						
-						Model model_2 = ModelFactory.createDefaultModel();
-						Log.d(TAG, "step4");
-						InputStream stream;
-						try 
-						{
-							stream = new ByteArrayInputStream(payload.getBytes("UTF-8"));
-							Log.d(TAG, "step4a");
-							model_2.read(stream, null);
-							Log.d(TAG, "step4b");
-							out = new StringWriter();
-							Log.d(TAG, "step4c");
-							result="";
-							Log.d(TAG, "step4d");
-							model_2.write(out, syntax);
-							Log.d(TAG, "step4e");
-							result = out.toString();
-							Log.d(TAG, "step4f");
-						} 
-						catch (UnsupportedEncodingException e) 
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							Log.e(TAG, "unspoorted coding exeption");
-						}
-						Log.d(TAG, "step 5");
-						//System.out.println("");
-						//System.out.println("");
-						
-						ResIterator resiter = model_2.listSubjects();
-						while(resiter.hasNext())
-						{
-							Log.d(TAG, "x");
-							Resource res = resiter.next();
-							res_contextEvent.addProperty(prop_hasData, res);
-							StmtIterator stmtIterator = res.listProperties();
-							model.add(stmtIterator);
-							while(stmtIterator.hasNext())
-							{
-								Statement stmt = stmtIterator.next();
+						Log.d(TAG, "format contains rdf/xml");
+						Model model = getSemanticInfo(event);
 
-							}
-							
-						}
-						Log.d(TAG, "step 6 ");
-
-						syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+						String syntax = "RDF/JSON"; // also try "N-TRIPLE" and "TURTLE"
 						Log.d(TAG, "step 6b");
-						out = new StringWriter();
+						StringWriter out = new StringWriter();
 						Log.d(TAG, "step 6c");
-						result="";
+						String result="";
 						Log.d(TAG, "step 6d");
-						// list the statements in the Model
+						
 						model.write(out, syntax);
 						Log.d(TAG, "step 6e");
 						result = out.toString();
@@ -1173,6 +1121,114 @@ public class ManagerManager extends Service
 			contexttype.requestContextUpdateIfNeeded();
 			String payload =" "; 
 			return payload.toString();
+		}
+		return null;
+	}
+	
+	private static Model getSemanticInfo(ContextEvent event)
+	{
+		Log.d(TAG, "get semantic representation");
+		String payload =event.getStringRepresentation("RDF/XML"); 
+		if(payload!=null)
+		{
+			Log.d(TAG, "payload\n"+payload);
+			payload=payload.replace("j.0", "xx.0");
+			payload=payload.replace("j.1", "xx.1");
+			payload=payload.replace("j.2", "xx.2");
+			Log.d(TAG, "step0");
+			Model model = ModelFactory.createDefaultModel();
+			Log.d(TAG, "step0b");
+			String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+			Log.d(TAG, "step0c");
+			StringWriter out = new StringWriter();
+			Log.d(TAG, "step0d");
+			String result ="";
+			Log.d(TAG, "step1");
+			
+			Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_"+event.getContextType()+"_"+event.getTimeStamp().getTime()+"");
+			Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_"+event.getEventSource().getPluginId()+"");
+			Log.d(TAG, "step2");
+			//create the Properties
+			Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasTypeID");
+			Property prop_createdAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "CreatedAt");
+			Property prop_expiration = model.createProperty("http://dynamix.org/semmodel/0.1/", "Expired");
+			Property prop_expirationAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "ExpiresAt");
+			Property prop_hasSource = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasSource");
+			Property prop_hasData = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasData");
+			Log.d(TAG, "step3");
+								
+			Property prop_pluginID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasID");
+			Property prop_pluginName= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasName");
+			
+			res_contextEvent.addProperty(prop_typeID, event.getContextType());
+			
+			res_contextEvent.addProperty(prop_createdAt, ""+event.getTimeStamp().getTime());
+			Date d = new Date();
+			long t = d.getTime();
+			if(t>event.getExpireTime().getTime())
+			{
+				res_contextEvent.addProperty(prop_expiration, "true");
+			}
+			else
+			{
+				res_contextEvent.addProperty(prop_expiration, "false");
+			}
+			res_contextEvent.addProperty(prop_expirationAt, ""+event.getExpireTime().getTime());
+			res_contextEvent.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/ContextEvent");
+			res_contextEvent.addProperty(prop_hasSource, res_sensor);
+			
+			res_sensor.addProperty(prop_pluginID, event.getEventSource().getPluginId());
+			res_sensor.addProperty(prop_pluginName, event.getEventSource().getPluginName());
+			
+			Model model_2 = ModelFactory.createDefaultModel();
+			Log.d(TAG, "step4");
+			InputStream stream;
+			try 
+			{
+				stream = new ByteArrayInputStream(payload.getBytes("UTF-8"));
+				Log.d(TAG, "step4a");
+				model_2.read(stream, null);
+				Log.d(TAG, "step4b");
+				out = new StringWriter();
+				Log.d(TAG, "step4c");
+				result="";
+				Log.d(TAG, "step4d");
+				model_2.write(out, syntax);
+				Log.d(TAG, "step4e");
+				result = out.toString();
+				Log.d(TAG, "step4f");
+			} 
+			catch (UnsupportedEncodingException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(TAG, "unspoorted coding exeption");
+			}
+			catch(Exception ex)
+			{
+				return null;
+			}
+			Log.d(TAG, "step 5");
+			//System.out.println("");
+			//System.out.println("");
+			
+			ResIterator resiter = model_2.listSubjects();
+			while(resiter.hasNext())
+			{
+				Log.d(TAG, "x");
+				Resource res = resiter.next();
+				res_contextEvent.addProperty(prop_hasData, res);
+				StmtIterator stmtIterator = res.listProperties();
+				model.add(stmtIterator);
+				while(stmtIterator.hasNext())
+				{
+					Statement stmt = stmtIterator.next();
+	
+				}
+				
+			}
+			Log.d(TAG, "step 6 ");
+			return model;
 		}
 		return null;
 	}

@@ -13,6 +13,9 @@
 	    <repository>
 	        <id>itm-maven-repository-releases-site</id>
 			<url>https://maven.itm.uni-luebeck.de/content/repositories/releases/</url>
+			<snapshots>
+			    <enabled>true</enabled>
+			</snapshots>
 	    </repository>
 	</repositories> 
 
