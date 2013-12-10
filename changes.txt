@@ -1,0 +1,4 @@
+Version 0.2
+- Supporting RDF for Dynamix plugins that support the Datatype RDF/XML
+- Lots of changes for stability
+- Discovery mechanism for Wifi Networks

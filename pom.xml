@@ -14,13 +14,6 @@
 	        <id>itm-maven-repository-releases-site</id>
 			<url>https://maven.itm.uni-luebeck.de/content/repositories/releases/</url>
 	    </repository>
-	    <repository>
-	       <id>4thline-repo</id>
-	       <url>http://4thline.org/m2</url>
-	       <snapshots>
-	           <enabled>false</enabled>
-	       </snapshots>
-   		</repository>
 	</repositories> 
 
     <dependencies>
@@ -33,7 +26,7 @@
         <dependency>
 		    <groupId>org.ambientdynamix</groupId>
 		    <artifactId>ambientdynamix</artifactId>
-		    <version>0.9.59</version>
+		    <version>0.9.61</version>
 		    <scope>system</scope>
 		    <systemPath>${project.basedir}/lib/org.ambientdynamix.application.api_v0.9.61.jar</systemPath>
 		</dependency>
@@ -43,27 +36,6 @@
 		    <version>1.0.2.3</version>
 		    <scope>system</scope>
 		    <systemPath>${project.basedir}/lib/quick-json-1.0.2.3.jar</systemPath>
-		</dependency>
-		<dependency>
-		    <groupId>jena-core</groupId>
-		    <artifactId>jena-core</artifactId>
-		    <version>2.7.3</version>
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/lib/jena-core-2.7.3.jar</systemPath>
-		</dependency>
-		<dependency>
-		    <groupId>org.ambientdynamix.contextlibrary</groupId>
-		    <artifactId>org.ambientdynamix.contextlibrary</artifactId>
-		    <version>0.1</version>
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/lib/ContextInterfaceLibrary.jar</systemPath>
-		</dependency>
-		<dependency>
-		    <groupId>org.ambientdynamix.contextplugins.pingplugin_datatypes_1.0.0</groupId>
-		    <artifactId>org.ambientdynamix.contextplugins.pingplugin_datatypes_1.0.0</artifactId>
-		    <version>1.0.0</version>
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/lib/datatypes/org.ambientdynamix.contextplugins.pingplugin_datatypes_1.0.0.jar</systemPath>
 		</dependency>
 	    <dependency>
 	        <groupId>de.uniluebeck.itm</groupId>
@@ -76,11 +48,11 @@
 		            </exclusion>
 	          </exclusions>
     	</dependency> 	
-     	<dependency>
+    	<!--<dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.6</version>
-        </dependency>
+            <version>1.6.4</version>
+        </dependency>-->
         <dependency>
             <groupId>com.strategicgains</groupId>
             <artifactId>RestExpress</artifactId>
@@ -101,11 +73,64 @@
 			<artifactId>jdom</artifactId>
 			<version>1.1</version>
 		</dependency>
+		<!-- <dependency>
+		    <groupId>jena-core</groupId>
+		    <artifactId>jena-core</artifactId>
+		    <version>2.7.3</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/jena-core-2.7.3.jar</systemPath>
+		</dependency>
 		<dependency>
-		    <groupId>com.googlecode.java-diff-utils</groupId>
-		    <artifactId>diffutils</artifactId>
-		    <version>1.2.1</version>
-		</dependency>	 
+		    <groupId>jena-iri</groupId>
+		    <artifactId>jena-iri</artifactId>
+		    <version>0.9.3</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/jena-iri-0.9.3.jar</systemPath>
+		</dependency>
+		<dependency>
+		    <groupId>xercesImpl</groupId>
+		    <artifactId>xercesImpl</artifactId>
+		    <version>0.1.1</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/xercesImpl.jar</systemPath>
+		</dependency>-->
+		<dependency>
+		    <groupId>slf4j</groupId>
+		    <artifactId>slf4j</artifactId>
+		    <version>1.6.1</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/slf4j-android-1.6.1-RC1.jar</systemPath>
+		</dependency>
+		<dependency>
+		    <groupId>iri</groupId>
+		    <artifactId>iri</artifactId>
+		    <version>0.8</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/iri-0.8.jar</systemPath>
+		</dependency>
+		<dependency>
+		    <groupId>icu4j</groupId>
+		    <artifactId>icu4j</artifactId>
+		    <version>3.4.5</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/icu4j-3.4.5.jar</systemPath>
+		</dependency>
+		<dependency>
+		    <groupId>icu4j</groupId>
+		    <artifactId>icu4j</artifactId>
+		    <version>3.4.5</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/icu4j-3.4.5.jar</systemPath>
+		</dependency>
+		<dependency>
+		    <groupId>androjena</groupId>
+		    <artifactId>androjena</artifactId>
+		    <version>0.5</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/lib/androjena_0.5.jar</systemPath>
+		</dependency>
+
+		
     </dependencies>
     
     <build>

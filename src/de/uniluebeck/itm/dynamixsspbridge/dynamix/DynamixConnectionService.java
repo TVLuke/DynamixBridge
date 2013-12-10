@@ -26,10 +26,8 @@ import org.ambientdynamix.api.application.ContextPluginInformation;
 import org.ambientdynamix.api.application.ContextPluginInformationResult;
 import org.ambientdynamix.api.application.ContextSupportInfo;
 import org.ambientdynamix.api.application.ContextSupportResult;
-import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
-import org.ambientdynamix.contextplugins.context.info.sample.IPingContextInfo;
 
 import android.app.Service;
 import android.content.ComponentName;

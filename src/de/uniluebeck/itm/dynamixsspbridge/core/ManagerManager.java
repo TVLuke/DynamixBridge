@@ -43,14 +43,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.json.parsers.JSONParser;
 import com.json.parsers.JsonParserFactory;
 import com.strategicgains.restexpress.RestExpress;
@@ -63,7 +55,16 @@ import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
-import difflib.DiffUtils;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * With more then only coap being suported we actually need to have a unified interface for all the Managers and then check which 
@@ -164,7 +165,6 @@ public class ManagerManager extends Service
 		if(type == MediaType.TEXT_PLAIN_UTF8)
 		{
 			Log.d(TAG, "MediaType Plain Text");
-			//return parseJSONRequest(payload);
 			return parsePlainTextRequest(payload);
 		}
 		if(type == MediaType.APP_JSON)
@@ -1025,20 +1025,29 @@ public class ManagerManager extends Service
 				if(mediaType == APP_JSON)
 				{
 					
-					Log.d(TAG, "format is JSON");
+					Log.d(TAG, "format is JSON ");
 					if(formats.contains("RDF/JSON"))
 					{
 						Log.d(TAG, "format contains rdf/json");
 						
 						String payload =event.getStringRepresentation("RDF/JSON"); 
+						
 						Log.d(TAG, "payload\n"+payload);
+						payload=payload.replace("j.0", "xx.0");
+						payload=payload.replace("j.1", "xx.1");
+						payload=payload.replace("j.2", "xx.2");
+						Log.d(TAG, "step0");
 						Model model = ModelFactory.createDefaultModel();
+						Log.d(TAG, "step0b");
 						String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+						Log.d(TAG, "step0c");
 						StringWriter out = new StringWriter();
+						Log.d(TAG, "step0d");
 						String result ="";
 						Log.d(TAG, "step1");
-						Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_lsdtfm_2222");
-						Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_org.ambientdynamix.contextplugins.lastfm");
+						
+						Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_"+event.getContextType()+"_"+event.getTimeStamp().getTime()+"");
+						Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_"+event.getEventSource().getPluginId()+"");
 						Log.d(TAG, "step2");
 						//create the Properties
 						Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasTypeID");
@@ -1052,15 +1061,16 @@ public class ManagerManager extends Service
 						Property prop_pluginID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasID");
 						Property prop_pluginName= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasName");
 						
-						res_contextEvent.addProperty(prop_typeID, "org.ambientdynamix.contextplugins.context.info.environment.currentsong");
-						res_contextEvent.addProperty(prop_createdAt, "156354632164");
-						res_contextEvent.addProperty(prop_expiration, "true");
-						res_contextEvent.addProperty(prop_expirationAt, "156354635164");
+						res_contextEvent.addProperty(prop_typeID, event.getContextType());
+						res_contextEvent.addProperty(prop_createdAt, ""+event.getTimeStamp().getTime());
+						
+						res_contextEvent.addProperty(prop_expiration, ""+event.expires());
+						res_contextEvent.addProperty(prop_expirationAt, ""+event.getExpireTime().getTime());
 						res_contextEvent.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/ContextEvent");
 						res_contextEvent.addProperty(prop_hasSource, res_sensor);
 						
-						res_sensor.addProperty(prop_pluginID, "org.ambientdynamix.contextplugins.lastfm");
-						res_sensor.addProperty(prop_pluginName, "Lastfm Plugin");
+						res_sensor.addProperty(prop_pluginID, event.getEventSource().getPluginId());
+						res_sensor.addProperty(prop_pluginName, event.getEventSource().getPluginName());
 						
 						Model model_2 = ModelFactory.createDefaultModel();
 						Log.d(TAG, "step4");
@@ -1068,11 +1078,17 @@ public class ManagerManager extends Service
 						try 
 						{
 							stream = new ByteArrayInputStream(payload.getBytes("UTF-8"));
+							Log.d(TAG, "step4a");
 							model_2.read(stream, null);
+							Log.d(TAG, "step4b");
 							out = new StringWriter();
+							Log.d(TAG, "step4c");
 							result="";
+							Log.d(TAG, "step4d");
 							model_2.write(out, syntax);
+							Log.d(TAG, "step4e");
 							result = out.toString();
+							Log.d(TAG, "step4f");
 						} 
 						catch (UnsupportedEncodingException e) 
 						{
@@ -1087,6 +1103,7 @@ public class ManagerManager extends Service
 						ResIterator resiter = model_2.listSubjects();
 						while(resiter.hasNext())
 						{
+							Log.d(TAG, "x");
 							Resource res = resiter.next();
 							res_contextEvent.addProperty(prop_hasData, res);
 							StmtIterator stmtIterator = res.listProperties();
@@ -1098,14 +1115,21 @@ public class ManagerManager extends Service
 							}
 							
 						}
-						Log.d(TAG, "step 6");
+						Log.d(TAG, "step 6 ");
 
-						syntax = "RDF/JSON"; // also try "N-TRIPLE" and "TURTLE"
+						syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
+						Log.d(TAG, "step 6b");
 						out = new StringWriter();
+						Log.d(TAG, "step 6c");
 						result="";
+						Log.d(TAG, "step 6d");
+						// list the statements in the Model
 						model.write(out, syntax);
+						Log.d(TAG, "step 6e");
 						result = out.toString();
+						Log.d(TAG, "step 6f");
 						Log.d(TAG, result);
+						Log.d(TAG, "step 6g");
 						return result;
 					}
 					else
