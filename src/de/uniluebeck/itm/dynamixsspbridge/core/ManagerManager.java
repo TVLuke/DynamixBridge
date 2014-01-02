@@ -37,9 +37,11 @@ import org.ambientdynamix.api.application.ContextEvent;
 import org.ambientdynamix.api.application.IContextInfo;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -77,7 +79,7 @@ public class ManagerManager extends Service
 {
 
 	private static String TAG ="SSPBridge";
-	
+	private static Context context=null;
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -88,7 +90,8 @@ public class ManagerManager extends Service
 	public void onCreate() 
 	{
 		super.onCreate();
-		 Log.d(TAG, "ManagerManager on Create ");
+		context=this;
+		 Log.d(TAG, "ManagerManager on Create");
 	}
 	
 	@Override
@@ -159,39 +162,58 @@ public class ManagerManager extends Service
 		return false;
 	}
 	
-	public static Bundle parseRequest(String payload, MediaType type)
+	public static Bundle parseRequest(Code code, String payload, MediaType type)
 	{
 		Log.d(TAG, "ManagerManager parseRequest");
-		if(type == MediaType.TEXT_PLAIN_UTF8)
+		HashMap<String, String> payloadmap = new HashMap<String, String>();
+		Log.d(TAG, "Code "+code);
+		if(Code.GET==code)
 		{
-			Log.d(TAG, "MediaType Plain Text");
-			return parsePlainTextRequest(payload);
-		}
-		if(type == MediaType.APP_JSON)
-		{
-			Log.d(TAG, "MediaType JSON");
-			if(payload.equals(""))
+			Log.d(TAG, "tokenize");
+			StringTokenizer tk = new StringTokenizer(payload, "=");
+			Bundle scanConfig = new Bundle();
+			while(tk.hasMoreElements())
 			{
-				return  new Bundle();
+				String key = tk.nextToken();
+				String value = tk.nextToken();
+				Log.d(TAG, "key:value ->"+key+":"+value);
+				payloadmap.put(key, value);
+
+				scanConfig.putString("token", value);
 			}
-			else
-			{
-				return parseJSONRequest(payload);
-			}
+			return scanConfig;
 		}
-		if(type == MediaType.APP_XML)
+		if(code == Code.POST || code == Code.PUT)
 		{
-			Log.d(TAG, "MediaType XML");
-			return parseXMLRequest(payload);
+			Log.d(TAG, "Post or Put");
+			if(type == MediaType.TEXT_PLAIN_UTF8)
+			{
+				Log.d(TAG, "MediaType Plain Text");
+				if(payload.equals(""))
+				{
+					return  new Bundle();
+				}
+				else
+				{
+					Bundle request = parsePlainTextRequest(payload);
+					return request;
+				}
+			}
+			if(type == MediaType.APP_JSON)
+			{
+				Log.d(TAG, "MediaType JSON");
+				if(payload.equals(""))
+				{
+					return  new Bundle();
+				}
+				else
+				{
+					Bundle request = parseJSONRequest(payload);
+					return request;
+				}
+			}
 		}
-		return null;
-	}
-	
-	private static Bundle parseXMLRequest(String payload)
-	{
-		Bundle scanConfig = new Bundle();
-		//THIS DOES NOT WORK YET
-		return scanConfig;
+		return new Bundle();
 	}
 
 	private static Bundle parseJSONRequest(String payload)
@@ -212,7 +234,8 @@ public class ManagerManager extends Service
 			{
 				if(key.equals("token"))
 				{
-					Log.d(TAG, "TOKEN");
+					Log.d(TAG, "TOKEN"+x);
+					scanConfig.putString("token", (String) x);
 				}
 				else
 				{
@@ -986,7 +1009,7 @@ public class ManagerManager extends Service
 						Model model = getSemanticInfo(event);
 						if(model!=null)
 						{
-							Log.d(TAG, "Modle is not null");
+							Log.d(TAG, "Model is not null");
 							String syntax = "RDF/XML"; // also try "N-TRIPLE" and "TURTLE"
 							Log.d(TAG, "step 6b");
 							StringWriter out = new StringWriter();
@@ -1145,16 +1168,17 @@ public class ManagerManager extends Service
 			String result ="";
 			Log.d(TAG, "step1");
 			
-			Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent_"+event.getContextType()+"_"+event.getTimeStamp().getTime()+"");
-			Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin_"+event.getEventSource().getPluginId()+"");
+			Resource res_contextEvent = model.createResource("http://dynamix.org/semmodel/0.1/ContextEvent/"+event.getContextType()+"_"+event.getTimeStamp().getTime()+"");
+			Resource res_sensor = model.createResource("http://dynamix.org/semmodel/0.1/DynamixPlugin/"+event.getEventSource().getPluginId()+"");
 			Log.d(TAG, "step2");
 			//create the Properties
-			Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasTypeID");
+			Property prop_typeID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasContextType");
 			Property prop_createdAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "CreatedAt");
 			Property prop_expiration = model.createProperty("http://dynamix.org/semmodel/0.1/", "Expired");
 			Property prop_expirationAt = model.createProperty("http://dynamix.org/semmodel/0.1/", "ExpiresAt");
-			Property prop_hasSource = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasSource");
+			Property prop_hasSource = model.createProperty("http://dynamix.org/semmodel/0.1/", "createdByPlugin");
 			Property prop_hasData = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasData");
+			Property prop_hasDevice = model.createProperty("http://dynamix.org/semmodel/0.1/", "hasDevice");
 			Log.d(TAG, "step3");
 								
 			Property prop_pluginID= model.createProperty("http://dynamix.org/semmodel/0.1/", "hasID");
@@ -1177,8 +1201,11 @@ public class ManagerManager extends Service
 			res_contextEvent.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/ContextEvent");
 			res_contextEvent.addProperty(prop_hasSource, res_sensor);
 			
+			//String deviceid=Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
 			res_sensor.addProperty(prop_pluginID, event.getEventSource().getPluginId());
+			res_sensor.addProperty(RDF.type, "http://dynamix.org/semmodel/0.1/DynamixPlugin");
 			res_sensor.addProperty(prop_pluginName, event.getEventSource().getPluginName());
+			//res_sensor.addProperty(prop_hasDevice , ""+deviceid);
 			
 			Model model_2 = ModelFactory.createDefaultModel();
 			Log.d(TAG, "step4");

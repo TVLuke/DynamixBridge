@@ -67,7 +67,7 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
             String payload = request.getPayload().toString(Charset.forName("UTF-8"));
             Log.d(TAG, "PUT: "+payload);
             MediaType requestMediaType =  request.getContentType();
-            Bundle scanConfig = ManagerManager.parseRequest(payload, requestMediaType);
+            Bundle scanConfig = ManagerManager.parseRequest(Code.PUT, payload, requestMediaType);
             if(scanConfig.containsKey("action_type"))
     		{
             	Log.d(TAG, "PUT contains action_type");

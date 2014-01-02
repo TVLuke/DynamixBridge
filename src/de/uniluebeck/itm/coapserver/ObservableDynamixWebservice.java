@@ -16,7 +16,7 @@
 
 package de.uniluebeck.itm.coapserver;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
+import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -38,6 +38,7 @@ import de.uniluebeck.itm.ncoap.application.server.webservice.ObservableWebServic
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
+import de.uniluebeck.itm.ncoap.message.header.Header;
 import de.uniluebeck.itm.ncoap.message.options.Option;
 import de.uniluebeck.itm.ncoap.message.options.UintOption;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
@@ -100,12 +101,23 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		{
             if(coapRequest.getCode() == Code.GET)
             {
-    			Log.d(TAG, "GET");
-                processGet(responseFuture, coapRequest);
+    			Log.d(TAG, "GET - THERE SHOULD NOT BE GET REQUESTS REALLY... ");
+    			Header h = coapRequest.getHeader();
+    			Log.d(TAG, "header "+h.toString());
+    			Log.d(TAG, remoteAddress.getAddress().getHostAddress());
+    			String query = coapRequest.getTargetUri().getQuery();
+    			if(query!=null)
+    			{
+    				Log.d(TAG, query);
+    			}
+                processGet(responseFuture, coapRequest, query);
             }
             else if(coapRequest.getCode() == Code.POST)
             {
     			Log.d(TAG, "POST");
+    			Header h = coapRequest.getHeader();
+    			Log.d(TAG, "header "+h.toString());
+    			Log.d(TAG, remoteAddress.getAddress().getHostAddress());
                 processPost(responseFuture, coapRequest);
             }
             else
@@ -128,19 +140,38 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
         String payload = request.getPayload().toString(Charset.forName("UTF-8"));
         MediaType requestMediaType =  request.getContentType();
         Log.d(TAG, "POST: "+payload);
-        scanConfig = ManagerManager.parseRequest(payload, requestMediaType);    
+        scanConfig = ManagerManager.parseRequest(Code.POST, payload, requestMediaType); 
+        String accesstoken="";
+        if(contexttype.isPublic())
+        {
+        	//everything is fine... get the token anyway, if its there. You never know what it might be good for
+        	if(scanConfig.containsKey("token"))
+        	{
+        		accesstoken = scanConfig.getString("token");
+        		
+        	}
+        }
+        else
+        {
+        	//one has to be authorized for this... so, at least there hast to be a tolken in the request
+        	if(scanConfig.containsKey("token"))
+        	{
+        		accesstoken = scanConfig.getString("token");
+        		
+        	}
+        }
         ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 
 		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
 		try
 		{
-			//If accept option is not set in the request, use the default (TEXT_PLAIN)
+			//If accept option is not set in the request, use the default (APP_XML)
 		        if(acceptOptions.isEmpty())
 		        {
 		        	Log.d(TAG, "accept optioon is empty");
 		            response = new CoapResponse(Code.CONTENT_205);
-		            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false));
-		            response.setContentType(TEXT_PLAIN_UTF8);
+		            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false));
+		            response.setContentType(APP_XML);
 		            responseFuture.set(response);
 		        }
 		
@@ -158,41 +189,67 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		                responseFuture.set(response);
 		            }
 		        }
-			}
-			catch(Exception e)
-			{
-				Log.d(TAG, "Exception at process get");
-			}
-		  responseFuture.set(response);
+		}
+		catch(Exception e)
+		{
+			Log.d(TAG, "Exception at process get in the process POST method of ObservableDynamixWebservice: "+e.getMessage());
+		}
+		responseFuture.set(response);
 	}
 	
-	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request)
+	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request, String query)
 	{
 		Log.d(TAG, "process get");
 		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
+		 Bundle scanConfig = new Bundle();
+	     //parse new status value
+	     String payload = request.getPayload().toString(Charset.forName("UTF-8"));
+	     MediaType requestMediaType =  request.getContentType();
+	     Log.d(TAG, "GET: "+payload);
+	     scanConfig = ManagerManager.parseRequest(Code.GET, query, requestMediaType); 
+	     String accesstoken="";
+	        if(contexttype.isPublic())
+	        {
+	        	//everything is fine... get the token anyway, if its there. You never know what it might be good for
+	        	if(scanConfig.containsKey("token"))
+	        	{
+	        		accesstoken = scanConfig.getString("token");
+	        		
+	        	}
+	        }
+	        else
+	        {
+	        	//one has to be authorized for this... so, at least there hast to be a tolken in the request
+	        	if(scanConfig.containsKey("token"))
+	        	{
+	        		accesstoken = scanConfig.getString("token");
+	        		
+	        	}
+	        }
+	        ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 
 		try
 		{
 	        //If accept option is not set in the request, use the default (TEXT_PLAIN)
 	        if(acceptOptions.isEmpty())
 	        {
-	        	Log.d(TAG, "accept optioon is empty");
+	        	Log.d(TAG, "accept optioon is empty ");
 	            CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false));
-	            response.setContentType(TEXT_PLAIN_UTF8);
+	            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false));
+	            response.setContentType(APP_XML);
 	            responseFuture.set(response);
 	        }
 	
 	        for(Option option : request.getOption(OptionName.ACCEPT)){
 	            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
 	            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
-	            byte[] payload = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
+	            byte[] payloadx = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
 	
 	            //the requested mediatype is supported
-	            if(payload != null)
+	            if(payloadx != null)
 	            {
 	                CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	                response.setPayload(payload);
+	                response.setPayload(payloadx);
 	                response.setContentType(acceptedMediaType);
 	                responseFuture.set(response);
 	            }
@@ -200,7 +257,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		}
 		catch(Exception e)
 		{
-			Log.d(TAG, "Exception at process get");
+			Log.d(TAG, "Exception at process get in the ObservableDynamixWebService");
 		}
 
         //This is only reached if all accepted mediatypes are not supported!

@@ -25,6 +25,7 @@ import org.ambientdynamix.api.application.ContextEvent;
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
+import de.uniluebeck.itm.dynamixbridge.accesscontrol.Tolken;
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPDynamixControler;
@@ -53,7 +54,8 @@ public class ContextType
 	private String redirect="";
 	private boolean httpactive=false;
 	private boolean coapactive=false;
-	
+	private boolean ispublic = true;
+	private ArrayList<Tolken> alowed = new ArrayList<Tolken>();
 	
 	private static enum ContextTypeStatus 
 	{
@@ -115,6 +117,11 @@ public class ContextType
 	public ContextEvent getPreviousEvent()
 	{
 		return previousEvent;
+	}
+	
+	public boolean isPublic()
+	{
+		return ispublic;
 	}
 	
 	public void setCurrentEvent(ContextEvent event)

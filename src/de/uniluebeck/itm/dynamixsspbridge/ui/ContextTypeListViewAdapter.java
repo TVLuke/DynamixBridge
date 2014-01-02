@@ -72,32 +72,49 @@ public class ContextTypeListViewAdapter extends BaseAdapter
 	{
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View itemView = inflater.inflate(R.layout.listview_contextevent_item, parent, false);
-		TextView friendlyname = (TextView) itemView.findViewById(R.id.friendlyname);
-		ContextType ct = contexttypes.get((String) contexttypes.keySet().toArray()[position]);
-		friendlyname.setText(ct.getUserFriendlyName());
-		TextView name = (TextView) itemView.findViewById(R.id.name);
-		name.setText(ct.getName());
-		final SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
-		//boolean ischecked= contexttypes.get((String) contexttypes.keySet().toArray()[position]).active();
-		if(ct.active())
+		try
 		{
-			ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
-			pic.setImageResource(R.drawable.active);
+			TextView friendlyname = (TextView) itemView.findViewById(R.id.friendlyname);
+			ContextType ct = contexttypes.get((String) contexttypes.keySet().toArray()[position]);
+			friendlyname.setText(ct.getUserFriendlyName());
+			TextView name = (TextView) itemView.findViewById(R.id.name);
+			name.setText(ct.getName());
+			final SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+			//boolean ischecked= contexttypes.get((String) contexttypes.keySet().toArray()[position]).active();
+			if(ct.active())
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
+				pic.setImageResource(R.drawable.active);
+			}
+			else if(ct.isWaitingForSubscription())
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
+				pic.setImageResource(R.drawable.waitingforsupport);
+			}
+			else if(ct.contextSupported())
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
+				pic.setImageResource(R.drawable.supported);
+			}
+			else
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
+				pic.setImageResource(R.drawable.inactive);
+			}
+			if(ct.isPublic())
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView2);
+				pic.setVisibility(View.GONE);
+			}
+			else
+			{
+				ImageView pic = (ImageView) itemView.findViewById(R.id.imageView2);
+				pic.setImageResource(R.drawable.key);
+			}
 		}
-		else if(ct.isWaitingForSubscription())
+		catch(Exception e)
 		{
-			ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
-			pic.setImageResource(R.drawable.waitingforsupport);
-		}
-		else if(ct.contextSupported())
-		{
-			ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
-			pic.setImageResource(R.drawable.supported);
-		}
-		else
-		{
-			ImageView pic = (ImageView) itemView.findViewById(R.id.imageView1);
-			pic.setImageResource(R.drawable.inactive);
+			//sometimes the view throws strange stuff...
 		}
 		//TODO set Picture
 		return itemView;

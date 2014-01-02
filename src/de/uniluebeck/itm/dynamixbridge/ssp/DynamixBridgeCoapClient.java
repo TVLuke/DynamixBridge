@@ -56,6 +56,8 @@ public class DynamixBridgeCoapClient extends Service
 				CoapClientApplication client = new CoapClientApplication();
 				URI targetURI = new URI ("coap://"+sspIP+"/here_i_am");
 				CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.GET, targetURI);
+				byte[] bytes = "lol".getBytes();
+				coapRequest.setPayload(bytes);
 				client.writeCoapRequest(coapRequest, new SimpleResponseProcessor());
 			}
 			catch(Exception e)

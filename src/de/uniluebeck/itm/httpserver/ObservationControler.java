@@ -35,6 +35,7 @@ import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
+import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 
 public class ObservationControler 
@@ -67,7 +68,7 @@ public class ObservationControler
 		{
 			mt = MediaType.APP_XML;
 		}
-		Bundle scanConfig = ManagerManager.parseRequest(payload, mt);
+		Bundle scanConfig = ManagerManager.parseRequest(Code.PUT, payload, mt);
 		if(scanConfig.containsKey("action_type"))
 		{
 			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))

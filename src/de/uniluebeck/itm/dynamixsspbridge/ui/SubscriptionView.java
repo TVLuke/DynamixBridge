@@ -16,10 +16,12 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.ui;
 
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.Utils;
+import de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient.SimpleResponseProcessor;
 import de.uniluebeck.itm.dynamixsspbridge.R;
 import de.uniluebeck.itm.dynamixsspbridge.core.StartService;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
@@ -27,6 +29,16 @@ import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
+import de.uniluebeck.itm.ncoap.application.client.CoapClientApplication;
+import de.uniluebeck.itm.ncoap.application.client.CoapResponseProcessor;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.EmptyAcknowledgementProcessor;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalEmptyAcknowledgementReceivedMessage;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalRetransmissionTimeoutMessage;
+import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.RetransmissionTimeoutProcessor;
+import de.uniluebeck.itm.ncoap.message.CoapRequest;
+import de.uniluebeck.itm.ncoap.message.CoapResponse;
+import de.uniluebeck.itm.ncoap.message.header.Code;
+import de.uniluebeck.itm.ncoap.message.header.MsgType;
 
 import android.app.Activity;
 import android.content.Context;
@@ -166,11 +178,57 @@ public class SubscriptionView extends Activity
 	            //TODO start activity TolkenOv
 	            return true;
 	        case R.id.action_key:
-	            //TODO
+	            //TODO delet this stuff again later.
+	        	Thread thr = new Thread() 
+	        	{
+	        		  public void run() 
+	        		  {
+	        			try
+	      				{
+	      					CoapClientApplication client = new CoapClientApplication();
+	      					URI targetURI = new URI ("coap://"+UpdateManager.getIP()+"/org/ambientdynamix/contextplugins/context/info/environment/currentsong?token=123456");
+	      					CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.POST, targetURI);
+	      					byte[] bytes = "lol".getBytes();
+	      					coapRequest.setPayload(bytes);
+	      					
+	      					client.writeCoapRequest(coapRequest, new SimpleResponseProcessor());
+	      				}
+	      				catch(Exception e)
+	      				{
+	      					Log.e(TAG, "test"+e.getMessage());
+	      				}
+	        		  }
+	        		};
+	        		thr.start();
+	     
+	        	//---
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
+	}
+	
+	public class SimpleResponseProcessor implements CoapResponseProcessor, EmptyAcknowledgementProcessor, RetransmissionTimeoutProcessor 
+	{
+
+		
+		@Override
+		public void processCoapResponse(CoapResponse coapResponse) 
+		{
+		    Log.d(TAG, "Received Response: " + coapResponse);
+		}
+		
+		@Override
+		public void processEmptyAcknowledgement(InternalEmptyAcknowledgementReceivedMessage message) 
+		{
+			Log.d(TAG, "Received empty ACK: " + message);
+		}
+		
+		@Override
+		public void processRetransmissionTimeout(InternalRetransmissionTimeoutMessage timeoutMessage) 
+		{
+			Log.d(TAG, "Transmission timed out: " + timeoutMessage);
+		}
 	}
 	
 	private class  UIUpdater implements Runnable
