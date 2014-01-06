@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.uniluebeck.itm.dynamixbridge.discovery;
+package de.uniluebeck.itm.dynamixbridge.networking;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -40,7 +40,6 @@ public class DiscoveryService extends Service
 	@Override
 	public IBinder onBind(Intent arg0) 
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -64,8 +63,8 @@ public class DiscoveryService extends Service
 	@Override
 	public void onDestroy()
 	{
-		super.onDestroy();
 	    tearDown();
+		super.onDestroy();
 		Log.d(TAG, "Stop... Destroy!");
 	}
 	

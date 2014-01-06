@@ -17,7 +17,7 @@
 package de.uniluebeck.itm.dynamixsspbridge.core;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
-import de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService;
+import de.uniluebeck.itm.dynamixbridge.networking.DiscoveryService;
 import de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;

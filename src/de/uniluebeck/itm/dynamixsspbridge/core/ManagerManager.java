@@ -22,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,34 +33,27 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ambientdynamix.api.application.ContextEvent;
-import org.ambientdynamix.api.application.IContextInfo;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings.Secure;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.json.parsers.JSONParser;
 import com.json.parsers.JsonParserFactory;
-import com.strategicgains.restexpress.RestExpress;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPServerManager;
-import de.uniluebeck.itm.ncoap.message.CoapResponse;
 import de.uniluebeck.itm.ncoap.message.header.Code;
 import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -80,6 +72,7 @@ public class ManagerManager extends Service
 
 	private static String TAG ="SSPBridge";
 	private static Context context=null;
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub

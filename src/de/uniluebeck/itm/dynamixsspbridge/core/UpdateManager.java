@@ -32,7 +32,7 @@ import org.jdom.input.SAXBuilder;
 
 import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.Utils;
-import de.uniluebeck.itm.dynamixbridge.discovery.DiscoveryService;
+import de.uniluebeck.itm.dynamixbridge.networking.DiscoveryService;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
