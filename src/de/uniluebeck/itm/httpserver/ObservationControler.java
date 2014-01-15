@@ -20,13 +20,11 @@ package de.uniluebeck.itm.httpserver;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.strategicgains.restexpress.ContentType;
 import com.strategicgains.restexpress.Format;
 import com.strategicgains.restexpress.Request;
 import com.strategicgains.restexpress.Response;
@@ -35,8 +33,8 @@ import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
 
 public class ObservationControler 
 {
@@ -55,20 +53,20 @@ public class ObservationControler
 		String payload = new String(ba);
 		//MediaType is strange in this lib...
 		String f = request.getFormat();
-		MediaType mt = null;
+		Long mt = null;
 		if(f.equals(Format.TXT))
 		{
-			mt = MediaType.TEXT_PLAIN_UTF8;
+			mt = ContentFormat.Name.TEXT_PLAIN_UTF8;
 		}
 		if(f.equals(Format.JSON))
 		{
-			mt = MediaType.APP_JSON;
+			mt = ContentFormat.Name.APP_JSON;
 		}
 		if(f.equals(Format.XML))
 		{
-			mt = MediaType.APP_XML;
+			mt = ContentFormat.Name.APP_XML;
 		}
-		Bundle scanConfig = ManagerManager.parseRequest(Code.PUT, payload, mt);
+		Bundle scanConfig = ManagerManager.parseRequest(MessageCode.Name.PUT, payload, mt);
 		if(scanConfig.containsKey("action_type"))
 		{
 			if(scanConfig.getString("action_type").equals("subscribe") && scanConfig.containsKey("context_type"))

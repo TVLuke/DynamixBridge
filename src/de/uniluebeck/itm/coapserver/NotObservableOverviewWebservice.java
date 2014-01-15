@@ -21,23 +21,23 @@ import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
-import de.uniluebeck.itm.ncoap.application.server.webservice.NotObservableWebService;
+import de.uniluebeck.itm.ncoap.application.server.webservice.AcceptedContentFormatNotSupportedException;
+import de.uniluebeck.itm.ncoap.application.server.webservice.NotObservableWebservice;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
-import de.uniluebeck.itm.ncoap.message.MessageDoesNotAllowPayloadException;
-import de.uniluebeck.itm.ncoap.message.header.Code;
+import de.uniluebeck.itm.ncoap.message.InvalidHeaderException;
+import de.uniluebeck.itm.ncoap.message.InvalidMessageException;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
+import de.uniluebeck.itm.ncoap.message.options.InvalidOptionException;
 import de.uniluebeck.itm.ncoap.message.options.Option;
 import de.uniluebeck.itm.ncoap.message.options.UintOption;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
-
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.PendingIntent;
@@ -46,28 +46,28 @@ import android.util.Log;
 
 import com.google.common.util.concurrent.SettableFuture;
 
-public class NotObservableOverviewWebService extends NotObservableWebService<String> 
+public class NotObservableOverviewWebservice extends NotObservableWebservice<String> 
 {
 	private static String TAG ="SSPBridge";
 	
-    public NotObservableOverviewWebService(String servicePath, String initialStatus) 
+    public NotObservableOverviewWebservice(String servicePath, String initialStatus) 
     {
-    	super(servicePath, initialStatus);
+    	super(servicePath, initialStatus, 999999999999999l);
     	Log.d(TAG, "starting test Server");
     	Log.d(TAG, "Path:"+ this.getPath());
     }
 
     //TODO: this should be PUT!
-	private void processPut(SettableFuture<CoapResponse> responseFuture, CoapRequest request) 
+	private void processPut(SettableFuture<CoapResponse> responseFuture, CoapRequest request) throws InvalidOptionException, InvalidMessageException, InvalidHeaderException 
 	{
         CoapResponse response;
         try
         {
             //parse new status value
-            String payload = request.getPayload().toString(Charset.forName("UTF-8"));
+            String payload = request.getContent().toString(Charset.forName("UTF-8"));
             Log.d(TAG, "PUT: "+payload);
-            MediaType requestMediaType =  request.getContentType();
-            Bundle scanConfig = ManagerManager.parseRequest(Code.PUT, payload, requestMediaType);
+            long requestMediaType = request.getContentFormat();
+            Bundle scanConfig = ManagerManager.parseRequest(MessageCode.Name.PUT, payload, requestMediaType);
             if(scanConfig.containsKey("action_type"))
     		{
             	Log.d(TAG, "PUT contains action_type");
@@ -84,9 +84,9 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		            {
 		            	Log.d(TAG, "type!=null");
 		            	NotificationService.requestContext(ctype);
-			            response = new CoapResponse(Code.CHANGED_204);
-			            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
-			            response.setContentType(MediaType.TEXT_PLAIN_UTF8);
+			            response = new CoapResponse(MessageCode.Name.CHANGED_204);
+			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+
 		
 			            responseFuture.set(response);
 		            }
@@ -104,9 +104,8 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		            {
 		            	Log.d(TAG, "type!=null");
 		            	NotificationService.requestUnsubscribeContext(ctype);
-			            response = new CoapResponse(Code.CHANGED_204);
-			            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
-			            response.setContentType(MediaType.TEXT_PLAIN_UTF8);
+			            response = new CoapResponse(MessageCode.Name.CHANGED_204);
+			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
 		
 			            responseFuture.set(response);
 		            }
@@ -116,21 +115,18 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 
 
         }
-        catch(Exception e){
-            response = new CoapResponse(Code.BAD_REQUEST_400);
-            try {
-                response.setPayload(e.getMessage().getBytes(Charset.forName("UTF-8")));
-            } catch (MessageDoesNotAllowPayloadException e1) {
-                //This should never happen!
-            }
+        catch(Exception e)
+        {
+            response = new CoapResponse(MessageCode.Name.BAD_REQUEST_400);
+            response.setContent(e.getMessage().getBytes(Charset.forName("UTF-8")), ContentFormat.Name.TEXT_PLAIN_UTF8);
             responseFuture.set(response);
         }
 		
 	}
 
-	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request) 
+	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request) throws InvalidHeaderException 
 	{
-		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
+		Set<Long> acceptOptions =request.getAcceptedContentFormats();
 
 		try
 		{
@@ -138,23 +134,21 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 	        if(acceptOptions.isEmpty())
 	        {
 	        	Log.d(TAG, "accept optioon is empty");
-	            CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	            response.setPayload(createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8));
-	            response.setContentType(TEXT_PLAIN_UTF8);
+	            CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
 	            responseFuture.set(response);
 	        }
 	
-	        for(Option option : request.getOption(OptionName.ACCEPT)){
-	            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
+	        for(long option : acceptOptions){
+	            long acceptedMediaType = option;
 	            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
 	            byte[] payload = createPayloadFromAcutualStatus(acceptedMediaType);
 	
 	            //the requested mediatype is supported
 	            if(payload != null)
 	            {
-	                CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	                response.setPayload(payload);
-	                response.setContentType(acceptedMediaType);
+	                CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	                response.setContent(payload, acceptedMediaType);
 	                responseFuture.set(response);
 	            }
 	        }
@@ -165,15 +159,15 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		}
 
         //This is only reached if all accepted mediatypes are not supported!
-        CoapResponse response = new CoapResponse(Code.UNSUPPORTED_MEDIA_TYPE_415);
+        CoapResponse response = new CoapResponse(MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
         responseFuture.set(response);
 		
 	}
 
-    private byte[] createPayloadFromAcutualStatus(MediaType mediaType)
+    private byte[] createPayloadFromAcutualStatus(long mediaType)
     {
     	Log.d(TAG, ""+mediaType);
-		byte[] r = ManagerManager.createContextTypeListResponse(mediaType);
+		byte[] r = ManagerManager.createContextTypeListResponse(""+mediaType);
 		return r;
     }
 
@@ -183,22 +177,27 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		 Log.d(TAG, "Service " + getPath() + " received request: " + request);
 	        try
 	        {
-	            if(request.getCode() == Code.GET)
+	            if(request.getMessageCode() == MessageCode.Name.GET.getNumber())
 	            {
 	                processGet(responseFuture, request);
 	            }
-	            else if(request.getCode() == Code.PUT)
+	            else if(request.getMessageCode() == MessageCode.Name.PUT.getNumber())
 	            {
 	                processPut(responseFuture, request);
 	            }
 	            else
 	            {
-	                responseFuture.set(new CoapResponse(Code.METHOD_NOT_ALLOWED_405));
+	                responseFuture.set(new CoapResponse(MessageCode.Name.METHOD_NOT_ALLOWED_405));
 	            }
 	        }
 	        catch(Exception e)
 	        {
-	            responseFuture.set(new CoapResponse(Code.INTERNAL_SERVER_ERROR_500));
+	            try {
+					responseFuture.set(new CoapResponse(MessageCode.Name.INTERNAL_SERVER_ERROR_500));
+				} catch (InvalidHeaderException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 	        }
 		
 	}
@@ -209,4 +208,24 @@ public class NotObservableOverviewWebService extends NotObservableWebService<Str
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void updateEtag(String resourceStatus) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean allowsDelete() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] getSerializedResourceStatus(long contentFormatNumber)	throws AcceptedContentFormatNotSupportedException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }

@@ -25,8 +25,8 @@ import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalRetran
 import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.RetransmissionTimeoutProcessor;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.header.MsgType;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
+import de.uniluebeck.itm.ncoap.message.MessageType;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -55,9 +55,9 @@ public class DynamixBridgeCoapClient extends Service
 			{
 				CoapClientApplication client = new CoapClientApplication();
 				URI targetURI = new URI ("coap://"+sspIP+"/here_i_am");
-				CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.GET, targetURI);
+				CoapRequest coapRequest =  new CoapRequest(MessageType.Name.CON, MessageCode.Name.GET, targetURI);
 				byte[] bytes = "lol".getBytes();
-				coapRequest.setPayload(bytes);
+				coapRequest.setContent(bytes);
 				client.writeCoapRequest(coapRequest, new SimpleResponseProcessor());
 			}
 			catch(Exception e)

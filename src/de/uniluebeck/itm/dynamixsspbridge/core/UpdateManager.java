@@ -127,7 +127,15 @@ public class UpdateManager extends IntentService
 					}
 				}
 				//stop all servers
-				ManagerManager.stopAllServers();
+				try 
+				{
+					ManagerManager.stopAllServers();
+				} 
+				catch (InterruptedException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				countdowntorestart--;
 				//we don't restart servers at once, they need a bit of time to shut down
 				

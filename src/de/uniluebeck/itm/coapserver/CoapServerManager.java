@@ -23,11 +23,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-import de.uniluebeck.itm.dynamixsspbridge.core.IServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
-import de.uniluebeck.itm.dynamixsspbridge.ui.ContextItemView;
-import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
+import de.uniluebeck.itm.ncoap.application.server.webservice.Webservice;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -40,8 +38,8 @@ public class CoapServerManager extends Service
 	private static HashMap<String, DynamixCoapServer> serverList = new HashMap<String, DynamixCoapServer>();
 	
 	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
+	public IBinder onBind(Intent arg0)
+	{
 		return null;
 	}
 	
@@ -64,7 +62,15 @@ public class CoapServerManager extends Service
 	@Override
 	public void onDestroy() 
 	{
-		stopAllServers();
+		try 
+		{
+			stopAllServers();
+		} 
+		catch (InterruptedException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		super.onDestroy();	
 	}
 	
@@ -82,7 +88,7 @@ public class CoapServerManager extends Service
 		{
 			DynamixCoapServer server = new DynamixCoapServer(port);
 			Log.d(TAG, "Server started and listening on port " + server.getServerPort());
-			server.registerService(new NotObservableOverviewWebService("/service/dynamix/contexttypes"," "));
+			server.registerService(new NotObservableOverviewWebservice("/service/dynamix/contexttypes"," "));
 			serverList.put("s1", server);
 		}
 		catch(Exception e)
@@ -92,59 +98,43 @@ public class CoapServerManager extends Service
 		}
 	}
 	
-	public static void stopAllServers()
+	public static void stopAllServers() throws InterruptedException
 	{
 		Log.d(TAG, "stop all servers");
-		try 
+		for(int i=0; i<serverList.size(); i++)
 		{
-			for(int i=0; i<serverList.size(); i++)
+			DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[i]));
+			ConcurrentHashMap<String, Webservice> services = s.getRegisteredServices();
+			Set<String> keys = services.keySet();
+			Iterator<String> it = keys.iterator();
+			while(it.hasNext())
 			{
-				DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[i]));
-				ConcurrentHashMap<String, WebService> services = s.getRegisteredServices();
-				Set<String> keys = services.keySet();
-				Iterator<String> it = keys.iterator();
-				while(it.hasNext())
-				{
-					String key = it.next();
-					WebService serv = services.get(key);
-					serv.shutdown();
-				}
-				s.shutdown();
-				serverList.remove((String) (serverList.keySet().toArray()[i]));
+				String key = it.next();
+				Webservice serv = services.get(key);
+				serv.shutdown();
 			}
-		} 
-		catch (InterruptedException e) 
-		{
-			Log.e(TAG, "This is a strange error");
-			e.printStackTrace();
+			s.shutdown();
+			serverList.remove((String) (serverList.keySet().toArray()[i]));
 		}
 	}
 	
-	public static void stopServer(String serverName)
+	public static void stopServer(String serverName) throws InterruptedException
 	{
 		Log.d(TAG, "Stop Server "+serverName);
 		DynamixCoapServer s = serverList.get(serverName);
-		ConcurrentHashMap<String, WebService> services = s.getRegisteredServices();
+		ConcurrentHashMap<String, Webservice> services = s.getRegisteredServices();
 		Set<String> keys = services.keySet();
 		Iterator<String> it = keys.iterator();
 		while(it.hasNext())
 		{
 			String key = it.next();
-			WebService serv = services.get(key);
+			Webservice serv = services.get(key);
 			serv.shutdown();
 		}
 		if(s!=null)
 		{
-			try 
-			{
-				s.shutdown();
-				serverList.remove(serverName);
-			} 
-			catch (InterruptedException e) 
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			s.shutdown();
+			serverList.remove(serverName);
 		}
 	}
 
@@ -154,27 +144,39 @@ public class CoapServerManager extends Service
 		DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[0]));
 		if(s!=null)
 		{
-			//Log.d(TAG, "server is not null.");
+			Log.d(TAG, "server is not null.");
 			if(contexttype!=null && updateintervall>0)
 			{
-				//Log.d(TAG, "The values given are cool.");
+				Log.d(TAG, "The values given are cool.");
 				try
 				{
-					s.registerService(new ObservableDynamixWebservice(contexttype, updateintervall));
-					//Log.d(TAG, "next line");
-					contexttype.activate(s.getServerPort(), updateintervall);
-					//Log.d(TAG, "next line2");
-					if(!contexttype.getName().endsWith(".man"))
+					Log.d(TAG, "next line0");
+					Log.d(TAG, ""+s.getServerPort());
+					ObservableDynamixWebservice ods = new ObservableDynamixWebservice(contexttype, updateintervall);
+					Log.d(TAG, "next lineb");
+					if(ods!=null)
 					{
-						//Log.d(TAG, "in the if");
-						s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
-						//Log.d(TAG, "still");
-						contexttype.getManType().activate(s.getServerPort(), updateintervall);
+						Log.d(TAG, "next linec");
+						s.registerService(ods);
+						Log.d(TAG, "next line1");
+						contexttype.activate(s.getServerPort(), updateintervall);
+						Log.d(TAG, "next line2");
+						if(!contexttype.getName().endsWith(".man"))
+						{
+							Log.d(TAG, "in the if");
+							s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
+							Log.d(TAG, "still");
+							contexttype.getManType().activate(s.getServerPort(), updateintervall);
+						}
+					}
+					else
+					{
+						Log.d(TAG, "ods is null");
 					}
 				}
 				catch(Exception e)
 				{
-					Log.e(TAG, "was get da bitte?");
+					Log.e(TAG, "was get da bitte?"+e.getLocalizedMessage()+" "+e.getStackTrace().toString());
 					removeService(contexttype);
 				}
 				

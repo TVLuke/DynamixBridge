@@ -18,23 +18,16 @@
 package de.uniluebeck.itm.httpserver;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
 
 import com.strategicgains.restexpress.Format;
-import com.strategicgains.restexpress.Parameters;
 import com.strategicgains.restexpress.RestExpress;
 
-
-import de.uniluebeck.itm.coapserver.DynamixCoapServer;
-import de.uniluebeck.itm.coapserver.NotObservableOverviewWebService;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
-import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
 
 import android.app.Service;
 import android.content.Intent;

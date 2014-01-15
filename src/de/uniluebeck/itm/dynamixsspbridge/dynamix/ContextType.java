@@ -132,12 +132,12 @@ public class ContextType
 		for(int i=0; i<observableservices.size(); i++)
 		{
 			Log.d(TAG, "update observable service");
-			observableservices.get(i).setResourceStatus(event);
+			observableservices.get(i).setResourceStatus(event, 10);
 		}
 		for(int i=0; i<notobservableservices.size(); i++)
 		{
 			Log.d(TAG, "update not observable service");
-			notobservableservices.get(i).setResourceStatus(event);
+			notobservableservices.get(i).setResourceStatus(event, 10);
 		}
 	}
 
@@ -148,7 +148,7 @@ public class ContextType
 			observableservices.add(service);
 			if(currentEvent!=null)
 			{
-				service.setResourceStatus(currentEvent);
+				service.setResourceStatus(currentEvent, 10);
 			}
 		}
 		else
@@ -162,7 +162,7 @@ public class ContextType
 		notobservableservices.add(service);
 		if(currentEvent!=null)
 		{
-			service.setResourceStatus(currentEvent);
+			service.setResourceStatus(currentEvent, 10);
 		}
 	}
 	
@@ -308,8 +308,10 @@ public class ContextType
 
 	public void contextsupportadded() 
 	{
+		Log.d(TAG, "ContextType: contextsupportadded()");
 		if(status.equals(ContextTypeStatus.WAITINGFORSUPPORT))
 		{
+			Log.d(TAG, "was waiting, so...");
 			status=ContextTypeStatus.SUPPORTED;
 			ManagerManager.addService(this, getUpdateIntervall());
 		}
@@ -334,8 +336,10 @@ public class ContextType
 
 	public void subscribe() 
 	{
+		Log.d(TAG, "subscribe!!");
 		if(status.equals(ContextTypeStatus.INACTIVE))
 		{
+			Log.d(TAG, "success");
 			DynamixConnectionService.subscribeToContext(this);
 			status=ContextTypeStatus.WAITINGFORSUPPORT;
 		}

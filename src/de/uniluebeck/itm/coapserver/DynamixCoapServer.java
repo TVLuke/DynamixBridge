@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.uniluebeck.itm.ncoap.application.server.CoapServerApplication;
-import de.uniluebeck.itm.ncoap.application.server.webservice.WebService;
+import de.uniluebeck.itm.ncoap.application.server.webservice.Webservice;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WellKnownCoreResource;
 
 //based on https://bitbucket.org/natas_sevil/coapserver
@@ -36,6 +36,7 @@ public class DynamixCoapServer extends CoapServerApplication
 {
 	private final String TAG ="SSPBridge";
 	public static boolean[] usedports= new boolean[10000];
+	private int port=5683;
 
 	public DynamixCoapServer()
 	{
@@ -46,6 +47,7 @@ public class DynamixCoapServer extends CoapServerApplication
 	public DynamixCoapServer(int port)
 	{
 		super(port);
+		this.port=port;
 		usedports[port]=true;
 	}
 	
@@ -53,12 +55,12 @@ public class DynamixCoapServer extends CoapServerApplication
     {
     }
 
-    protected ConcurrentHashMap<String, WebService> getRegisteredServices() 
+    protected ConcurrentHashMap<String, Webservice> getRegisteredServices() 
     {
         try 
         {
             Field privateStringField = getClass().getDeclaredField("registeredServices");
-            return (ConcurrentHashMap<String, WebService>) privateStringField.get(this);
+            return (ConcurrentHashMap<String, Webservice>) privateStringField.get(this);
         } 
         catch (NoSuchFieldException e) 
         {
@@ -68,7 +70,7 @@ public class DynamixCoapServer extends CoapServerApplication
         {
             e.printStackTrace();
         }
-        return new ConcurrentHashMap<String, WebService>();
+        return new ConcurrentHashMap<String, Webservice>();
     }
 
     public void refreshRootService() 
@@ -76,5 +78,10 @@ public class DynamixCoapServer extends CoapServerApplication
         removeService("/.well-known/core");
         registerService(new WellKnownCoreResource(getRegisteredServices()));
     }
+
+	public int getServerPort() 
+	{
+		return port;
+	}
 
 }

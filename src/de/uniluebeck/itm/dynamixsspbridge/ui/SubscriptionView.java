@@ -37,8 +37,8 @@ import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.InternalRetran
 import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.RetransmissionTimeoutProcessor;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.header.MsgType;
+import de.uniluebeck.itm.ncoap.message.MessageType;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
 
 import android.app.Activity;
 import android.content.Context;
@@ -187,9 +187,9 @@ public class SubscriptionView extends Activity
 	      				{
 	      					CoapClientApplication client = new CoapClientApplication();
 	      					URI targetURI = new URI ("coap://"+UpdateManager.getIP()+"/org/ambientdynamix/contextplugins/context/info/environment/currentsong?token=123456");
-	      					CoapRequest coapRequest =  new CoapRequest(MsgType.CON, Code.POST, targetURI);
+	      					CoapRequest coapRequest =  new CoapRequest(MessageType.Name.CON, MessageCode.Name.POST, targetURI);
 	      					byte[] bytes = "lol".getBytes();
-	      					coapRequest.setPayload(bytes);
+	      					coapRequest.setContent(bytes);
 	      					
 	      					client.writeCoapRequest(coapRequest, new SimpleResponseProcessor());
 	      				}

@@ -16,9 +16,6 @@
 
 package de.uniluebeck.itm.httpserver;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.TEXT_PLAIN_UTF8;
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
@@ -31,8 +28,8 @@ import com.strategicgains.restexpress.Response;
 
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
 
 public class HTTPDynamixControler 
 {
@@ -76,14 +73,14 @@ public class HTTPDynamixControler
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false);
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());
@@ -106,20 +103,20 @@ public class HTTPDynamixControler
 		Log.d(TAG, payload);
 		Bundle scanConfig = new Bundle();
 		String f = request.getFormat();
-		MediaType mt = null;
+		Long mt = null;
 		if(f.equals(Format.TXT))
 		{
-			mt = MediaType.TEXT_PLAIN_UTF8;
+			mt = ContentFormat.Name.TEXT_PLAIN_UTF8;
 		}
 		if(f.equals(Format.JSON))
 		{
-			mt = MediaType.APP_JSON;
+			mt = ContentFormat.Name.APP_JSON;
 		}
 		if(f.equals(Format.XML))
 		{
-			mt = MediaType.APP_XML;
+			mt = ContentFormat.Name.APP_XML;
 		}
-		scanConfig = ManagerManager.parseRequest(Code.POST, payload, mt);
+		scanConfig = ManagerManager.parseRequest(MessageCode.Name.POST, payload, mt);
 		Log.d(TAG, "x");
 	    ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 	    //TODO: if Bundle contains a command to compres only transmit the dif between this status and the previous one.
@@ -129,14 +126,14 @@ public class HTTPDynamixControler
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(TEXT_PLAIN_UTF8, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false);
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());

@@ -16,8 +16,6 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.core;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -48,8 +46,8 @@ import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPServerManager;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -114,7 +112,7 @@ public class ManagerManager extends Service
 		
 	}
 	
-	public static void stopAllServers()
+	public static void stopAllServers() throws InterruptedException
 	{
 		 Log.e(TAG, "ManagerManager stopAllServers");
 		CoapServerManager.stopAllServers();
@@ -155,12 +153,12 @@ public class ManagerManager extends Service
 		return false;
 	}
 	
-	public static Bundle parseRequest(Code code, String payload, MediaType type)
+	public static Bundle parseRequest(MessageCode.Name code, String payload, long type)
 	{
 		Log.d(TAG, "ManagerManager parseRequest");
 		HashMap<String, String> payloadmap = new HashMap<String, String>();
 		Log.d(TAG, "Code "+code);
-		if(Code.GET==code)
+		if(MessageCode.Name.GET==code)
 		{
 			Log.d(TAG, "tokenize");
 			StringTokenizer tk = new StringTokenizer(payload, "=");
@@ -176,10 +174,10 @@ public class ManagerManager extends Service
 			}
 			return scanConfig;
 		}
-		if(code == Code.POST || code == Code.PUT)
+		if(code == MessageCode.Name.POST || code == MessageCode.Name.PUT)
 		{
 			Log.d(TAG, "Post or Put");
-			if(type == MediaType.TEXT_PLAIN_UTF8)
+			if(type ==  ContentFormat.Name.TEXT_PLAIN_UTF8)
 			{
 				Log.d(TAG, "MediaType Plain Text");
 				if(payload.equals(""))
@@ -192,7 +190,7 @@ public class ManagerManager extends Service
 					return request;
 				}
 			}
-			if(type == MediaType.APP_JSON)
+			if(type ==  ContentFormat.Name.APP_JSON)
 			{
 				Log.d(TAG, "MediaType JSON");
 				if(payload.equals(""))
@@ -960,10 +958,10 @@ public class ManagerManager extends Service
 		  }
 	}
 	
-	public static String createStringPayloadFromAcutualStatus(MediaType mediaType, ContextEvent event, ContextType contexttype)
+	public static String createStringPayloadFromAcutualStatus(long mediaType, ContextEvent event, ContextType contexttype)
 	{
 		Log.d(TAG, "payload from actual status");
-		Log.d(TAG, "Mediatype: "+mediaType.toString());
+		Log.d(TAG, "Mediatype: "+mediaType);
     	Date d = new Date();
     	if(event!=null)
     	{
@@ -986,14 +984,14 @@ public class ManagerManager extends Service
         	Log.d(TAG, "Difference in minutes="+(dif1/1000)/60);
         	Log.d(TAG, "Difference in hours="+((dif1/1000)/60)/60);
         		Set<String> formats = event.getStringRepresentationFormats();
-        		if(mediaType==TEXT_PLAIN_UTF8)
+        		if(mediaType==ContentFormat.Name.TEXT_PLAIN_UTF8)
         		{
         			//TODO: This is evil. And Wroooong. And Evil. And Evil.
-        			mediaType= APP_XML;
+        			mediaType= ContentFormat.Name.APP_XML;
         		}
         			
 		    	Log.d(TAG, "mediatype="+mediaType);				
-				if(mediaType==APP_XML)
+				if(mediaType==ContentFormat.Name.APP_XML)
 				{
 					Log.d(TAG, "formatxml");
 					if(formats.contains("RDF/XML"))
@@ -1062,7 +1060,7 @@ public class ManagerManager extends Service
 					}
 
 				}
-				if(mediaType == TEXT_PLAIN_UTF8)
+				if(mediaType == ContentFormat.Name.TEXT_PLAIN_UTF8)
 				{
 					Log.d(TAG, "format is Plain Stuff");
 					if(formats.contains("text/plain"))
@@ -1072,7 +1070,7 @@ public class ManagerManager extends Service
 						return payload.toString();
 					}
 				}
-				if(mediaType == APP_JSON)
+				if(mediaType == ContentFormat.Name.APP_JSON)
 				{
 					
 					Log.d(TAG, "format is JSON ");
@@ -1108,21 +1106,21 @@ public class ManagerManager extends Service
 						}
 					}
 				}
-				if(mediaType == APP_N3)
+				if(mediaType == ContentFormat.Name.APP_N3)
 				{
 					if(formats.contains("N3"))
 					{
 						
 					}
 				}
-				if(mediaType== APP_TURTLE)
+				if(mediaType== ContentFormat.Name.APP_TURTLE)
 				{
 					if(formats.contains("Turtle"))
 					{
 						
 					}
 				}
-				if(mediaType == APP_SHDT)
+				if(mediaType == ContentFormat.Name.APP_SHDT)
 				{
 					if(formats.contains("SHDT"))
 					{
@@ -1253,7 +1251,7 @@ public class ManagerManager extends Service
 		return null;
 	}
 	
-	public static byte[] createPayloadFromAcutualStatus(MediaType mediaType, ContextType contextType, boolean compress)
+	public static byte[] createPayloadFromAcutualStatus(long mediaType, ContextType contextType, boolean compress)
 	{
 		if(compress)
 		{
@@ -1272,7 +1270,7 @@ public class ManagerManager extends Service
 	
 	public static byte[] createContextTypeListResponse(String format)
 	{
-		MediaType mediaType = APP_XML;
+		long mediaType = ContentFormat.Name.APP_XML;
 		if(format!=null)
 		{
 			return createContextTypeListResponse(mediaType);			
@@ -1283,11 +1281,11 @@ public class ManagerManager extends Service
 		}
 	}
 	
-	public static byte[] createContextTypeListResponse(MediaType mediaType)
+	public static byte[] createContextTypeListResponse(long mediaType)
 	{
 		String payload = new String();
 		ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-		if(mediaType==APP_XML)
+		if(mediaType==ContentFormat.Name.APP_XML)
 		{
 			payload ="<contexttypes>\n";
 			for(int i=0; i<types.size(); i++)
@@ -1311,7 +1309,7 @@ public class ManagerManager extends Service
 	    	}
 			payload=payload+"</contexttypes>";
 		}
-		if(mediaType == TEXT_PLAIN_UTF8)
+		if(mediaType == ContentFormat.Name.TEXT_PLAIN_UTF8)
 		{
 			for(int i=0; i<types.size(); i++)
 	    	{
@@ -1322,7 +1320,7 @@ public class ManagerManager extends Service
 	    		payload=payload+"  "+type.getDescription()+"\n";
 	    	}
 		}
-		if(mediaType == APP_JSON)
+		if(mediaType == ContentFormat.Name.APP_JSON)
 		{
 			payload="currently not supported";
 		}

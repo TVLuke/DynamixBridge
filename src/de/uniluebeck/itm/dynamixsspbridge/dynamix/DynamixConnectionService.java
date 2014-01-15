@@ -232,7 +232,9 @@ public class DynamixConnectionService extends Service
 		{
 			Log.i(TAG, "A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
 			ContextType ct= allContextTypes.get(supportInfo.getContextType());
+			Log.d(TAG, "A1, b");
 			ct.contextsupportadded();
+			Log.d(TAG, "A1, c");
 		}
 
 		@Override

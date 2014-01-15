@@ -20,8 +20,8 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import com.google.common.collect.HashBiMap;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
 import de.uniluebeck.itm.ncoap.message.options.Option;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -73,7 +73,7 @@ public class Utils {
      * @return absolute uri
      */
     public static String targetUri(CoapRequest request) {
-        String path = request.getTargetUri().getPath();
+        String path = request.getUriPath();//TODO: not sure if this is the right metjod... I don't get the new coap yet.
         String[] ipAddresses = Utils.getIPAddress(true).split(", ");
         if(ipAddresses.length > 0 && !ipAddresses[0].isEmpty()) {
             return "coap://"+ipAddresses[0] + path;
@@ -122,15 +122,17 @@ public class Utils {
     }
 
 
-    public static final HashBiMap<String, MediaType> MEDIA_TYPE_MAP = HashBiMap.create();
-    static {
-        MEDIA_TYPE_MAP.put("RDF/XML", MediaType.APP_RDF_XML);
-        MEDIA_TYPE_MAP.put("TURTLE", MediaType.APP_TURTLE);
-        MEDIA_TYPE_MAP.put("N3", MediaType.APP_N3);
+    public static final HashBiMap<String, Long> MEDIA_TYPE_MAP = HashBiMap.create();
+    static 
+    {
+        MEDIA_TYPE_MAP.put("RDF/XML", ContentFormat.Name.APP_RDF_XML);
+        MEDIA_TYPE_MAP.put("TURTLE", ContentFormat.Name.APP_TURTLE);
+        MEDIA_TYPE_MAP.put("N3", ContentFormat.Name.APP_N3);
     }
 
     public static final HashMap<Long,Long> COPPER_ACCEPT_MAP = new HashMap<Long, Long>();
-    static {
+    static 
+    {
         COPPER_ACCEPT_MAP.put(43l, 201l);
         COPPER_ACCEPT_MAP.put(43l, 201l);
         COPPER_ACCEPT_MAP.put(43l, 201l);

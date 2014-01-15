@@ -16,11 +16,10 @@
 
 package de.uniluebeck.itm.coapserver;
 
-import static de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType.APP_XML;
-
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -33,18 +32,17 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.ncoap.application.server.webservice.MediaTypeNotSupportedException;
-import de.uniluebeck.itm.ncoap.application.server.webservice.ObservableWebService;
+import de.uniluebeck.itm.ncoap.application.server.webservice.AcceptedContentFormatNotSupportedException;
+import de.uniluebeck.itm.ncoap.application.server.webservice.ObservableWebservice;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
-import de.uniluebeck.itm.ncoap.message.header.Code;
-import de.uniluebeck.itm.ncoap.message.header.Header;
+import de.uniluebeck.itm.ncoap.message.InvalidHeaderException;
+import de.uniluebeck.itm.ncoap.message.MessageCode;
+import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
 import de.uniluebeck.itm.ncoap.message.options.Option;
 import de.uniluebeck.itm.ncoap.message.options.UintOption;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.MediaType;
-import de.uniluebeck.itm.ncoap.message.options.OptionRegistry.OptionName;
 
-public class ObservableDynamixWebservice  extends ObservableWebService<ContextEvent> 
+public class ObservableDynamixWebservice  extends ObservableWebservice<ContextEvent> 
 {
 	private static String TAG ="SSPBridge";
 	private ContextType contexttype;
@@ -52,14 +50,15 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	
 	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
 	{
-		super("/"+contexttype.getName().replace(".", "/"), contexttype.getCurrentEvent());
+		super("/"+contexttype.getName().replace(".", "/"), contexttype.getCurrentEvent(), updateintervall/1000);
+		Log.d(TAG, "constructor line 2");
 		this.updateintervall=updateintervall;
+		Log.d(TAG, "constructor line 3");
 		int age = updateintervall/1000;
 		if(age<1)
 		{
 			age=1;
 		}
-		setMaxAge(age);
 		this.contexttype=contexttype;
 		contexttype.registerForUpdates(this);
 		Log.d(TAG, "new Service has been established for "+contexttype.getName());
@@ -87,7 +86,7 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
             @Override
             public void run() 
             {
-                setResourceStatus(contexttype.getCurrentEvent());
+                setResourceStatus(contexttype.getCurrentEvent(), (updateintervall/1000));
                 Log.d(TAG, "New status of resource " + getPath() + ": " + getResourceStatus().getContextType());
             }
         },0, updateintervall, TimeUnit.MILLISECONDS);
@@ -99,36 +98,37 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		Log.d(TAG, "got request");
 		try
 		{
-            if(coapRequest.getCode() == Code.GET)
+            if(coapRequest.getMessageCode() == MessageCode.Name.GET.getNumber())
             {
     			Log.d(TAG, "GET - THERE SHOULD NOT BE GET REQUESTS REALLY... ");
-    			Header h = coapRequest.getHeader();
-    			Log.d(TAG, "header "+h.toString());
     			Log.d(TAG, remoteAddress.getAddress().getHostAddress());
-    			String query = coapRequest.getTargetUri().getQuery();
+    			String query = coapRequest.getUriQuery();
     			if(query!=null)
     			{
-    				Log.d(TAG, query);
+    				Log.d(TAG, "Query "+query);
     			}
                 processGet(responseFuture, coapRequest, query);
             }
-            else if(coapRequest.getCode() == Code.POST)
+            else if(coapRequest.getMessageCode() == MessageCode.Name.POST.getNumber())
             {
     			Log.d(TAG, "POST");
-    			Header h = coapRequest.getHeader();
-    			Log.d(TAG, "header "+h.toString());
     			Log.d(TAG, remoteAddress.getAddress().getHostAddress());
                 processPost(responseFuture, coapRequest);
             }
             else
             {
-                responseFuture.set(new CoapResponse(Code.METHOD_NOT_ALLOWED_405));
+                responseFuture.set(new CoapResponse(MessageCode.Name.METHOD_NOT_ALLOWED_405));
             }
         }
         catch(Exception e)
         {
             Log.e(TAG, ""+e);
-            responseFuture.set(new CoapResponse(Code.INTERNAL_SERVER_ERROR_500));
+            try {
+				responseFuture.set(new CoapResponse(MessageCode.Name.INTERNAL_SERVER_ERROR_500));
+			} catch (InvalidHeaderException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
 	}
 
@@ -137,10 +137,10 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		CoapResponse response = null;
         Bundle scanConfig = new Bundle();
         //parse new status value
-        String payload = request.getPayload().toString(Charset.forName("UTF-8"));
-        MediaType requestMediaType =  request.getContentType();
+        String payload = request.getContent().toString(Charset.forName("UTF-8"));
+        long requestMediaType =  request.getContentFormat();
         Log.d(TAG, "POST: "+payload);
-        scanConfig = ManagerManager.parseRequest(Code.POST, payload, requestMediaType); 
+        scanConfig = ManagerManager.parseRequest(MessageCode.Name.POST, payload, requestMediaType); 
         String accesstoken="";
         if(contexttype.isPublic())
         {
@@ -162,30 +162,28 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
         }
         ManagerManager.updateToReleventEvent(contexttype, scanConfig);
 
-		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
+		Set<Long> acceptOptions = request.getAcceptedContentFormats();
 		try
 		{
 			//If accept option is not set in the request, use the default (APP_XML)
 		        if(acceptOptions.isEmpty())
 		        {
 		        	Log.d(TAG, "accept optioon is empty");
-		            response = new CoapResponse(Code.CONTENT_205);
-		            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false));
-		            response.setContentType(APP_XML);
+		            response = new CoapResponse(MessageCode.Name.CONTENT_205);
+		            response.setContent(ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false), ContentFormat.Name.APP_XML);
 		            responseFuture.set(response);
 		        }
 		
-		        for(Option option : request.getOption(OptionName.ACCEPT))
+		        for(long option : acceptOptions)
 		        {
-		            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
+		            long acceptedMediaType = option;
 		            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
 		            byte[] payloadx = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
 		            //the requested mediatype is supported
 		            if(payloadx != null)
 		            {
-		                response = new CoapResponse(Code.CONTENT_205);
-		                response.setPayload(payloadx);
-		                response.setContentType(acceptedMediaType);
+		                response = new CoapResponse(MessageCode.Name.CONTENT_205);
+		                response.setContent(payloadx, acceptedMediaType);
 		                responseFuture.set(response);
 		            }
 		        }
@@ -197,16 +195,16 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		responseFuture.set(response);
 	}
 	
-	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request, String query)
+	private void processGet(SettableFuture<CoapResponse> responseFuture, CoapRequest request, String query) throws InvalidHeaderException
 	{
 		Log.d(TAG, "process get");
-		List<Option> acceptOptions = request.getOption(OptionName.ACCEPT);
+		Set<Long> acceptOptions = request.getAcceptedContentFormats();
 		 Bundle scanConfig = new Bundle();
 	     //parse new status value
-	     String payload = request.getPayload().toString(Charset.forName("UTF-8"));
-	     MediaType requestMediaType =  request.getContentType();
+	     String payload = request.getContent().toString(Charset.forName("UTF-8"));
+	     long requestMediaType =  request.getContentFormat();
 	     Log.d(TAG, "GET: "+payload);
-	     scanConfig = ManagerManager.parseRequest(Code.GET, query, requestMediaType); 
+	     scanConfig = ManagerManager.parseRequest(MessageCode.Name.GET, query, requestMediaType); 
 	     String accesstoken="";
 	        if(contexttype.isPublic())
 	        {
@@ -234,23 +232,21 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 	        if(acceptOptions.isEmpty())
 	        {
 	        	Log.d(TAG, "accept optioon is empty ");
-	            CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	            response.setPayload(ManagerManager.createPayloadFromAcutualStatus(APP_XML, contexttype, false));
-	            response.setContentType(APP_XML);
+	            CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	            response.setContent(ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false), ContentFormat.Name.APP_XML);
 	            responseFuture.set(response);
 	        }
 	
-	        for(Option option : request.getOption(OptionName.ACCEPT)){
-	            MediaType acceptedMediaType = MediaType.getByNumber(((UintOption) option).getDecodedValue());
+	        for(long option : acceptOptions){
+	            long acceptedMediaType = option;
 	            Log.d(TAG, "Try to create payload for accepted mediatype " + acceptedMediaType);
 	            byte[] payloadx = ManagerManager.createPayloadFromAcutualStatus(acceptedMediaType, contexttype, false);
 	
 	            //the requested mediatype is supported
 	            if(payloadx != null)
 	            {
-	                CoapResponse response = new CoapResponse(Code.CONTENT_205);
-	                response.setPayload(payloadx);
-	                response.setContentType(acceptedMediaType);
+	                CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	                response.setContent(payloadx, acceptedMediaType);
 	                responseFuture.set(response);
 	            }
 	        }
@@ -261,16 +257,58 @@ public class ObservableDynamixWebservice  extends ObservableWebService<ContextEv
 		}
 
         //This is only reached if all accepted mediatypes are not supported!
-        CoapResponse response = new CoapResponse(Code.UNSUPPORTED_MEDIA_TYPE_415);
+        CoapResponse response = new CoapResponse(MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
         responseFuture.set(response);
 
 
 	}
-	
-   	@Override
-	public byte[] getSerializedResourceStatus(MediaType mediaType) throws MediaTypeNotSupportedException 
+
+	@Override
+	public void updateEtag(ContextEvent resourceStatus)
 	{
-		return ManagerManager.createPayloadFromAcutualStatus(mediaType, contexttype, false);
+		Log.d(TAG, "update ETAG");
+		byte[] etag = new byte[4];
+		if(resourceStatus!=null)
+		{
+			String rs = resourceStatus.toString();
+			//TODO: später vernünftig machen!
+			if(rs.getBytes().length>3)
+			{
+				etag[0]= rs.getBytes()[0];
+				etag[1]= rs.getBytes()[1];
+				etag[2]= rs.getBytes()[2];
+				etag[3]= rs.getBytes()[3];
+			}
+			else
+			{
+				etag[0]= rs.getBytes()[0];
+				etag[1]= rs.getBytes()[0];
+				etag[2]= rs.getBytes()[0];
+				etag[3]= rs.getBytes()[0];
+			}
+		}
+		else
+		{
+			etag[0]= 1;
+			etag[1]= 1;
+			etag[2]= 1;
+			etag[3]= 1;
+		}
+		setEtag(etag);
+		
 	}
+
+	@Override
+	public boolean allowsDelete() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] getSerializedResourceStatus(long contentFormat) throws AcceptedContentFormatNotSupportedException {
+		return ManagerManager.createPayloadFromAcutualStatus(contentFormat, contexttype, false);
+	}
+	
+
 	
 }
