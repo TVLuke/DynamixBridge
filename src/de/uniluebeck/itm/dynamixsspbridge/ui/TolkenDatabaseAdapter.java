@@ -2,7 +2,7 @@ package de.uniluebeck.itm.dynamixsspbridge.ui;
 
 import java.util.ArrayList;
 
-import de.uniluebeck.itm.dynamixbridge.accesscontrol.Tolken;
+import de.uniluebeck.itm.dynamixsspbridge.accesscontrol.Tolken;
 
 public class TolkenDatabaseAdapter {
 

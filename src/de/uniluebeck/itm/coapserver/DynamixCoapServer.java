@@ -18,6 +18,7 @@
 package de.uniluebeck.itm.coapserver;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,6 +27,7 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.ncoap.application.server.CoapServerApplication;
 import de.uniluebeck.itm.ncoap.application.server.webservice.Webservice;
 import de.uniluebeck.itm.ncoap.application.server.webservice.WellKnownCoreResource;
@@ -34,33 +36,22 @@ import de.uniluebeck.itm.ncoap.application.server.webservice.WellKnownCoreResour
 
 public class DynamixCoapServer extends CoapServerApplication
 {
-	private final String TAG ="SSPBridge";
-	public static boolean[] usedports= new boolean[10000];
-	private int port=5683;
 
 	public DynamixCoapServer()
 	{
-		//super(8885);
-		super();
-	}
-	
-	public DynamixCoapServer(int port)
-	{
-		super(port);
-		this.port=port;
-		usedports[port]=true;
+		super(Constants.COAP_PORT);
 	}
 	
     public void handleRetransmissionTimout() 
     {
     }
 
-    protected ConcurrentHashMap<String, Webservice> getRegisteredServices() 
+    protected HashMap<String, Webservice> getRegisteredServices()
     {
         try 
         {
             Field privateStringField = getClass().getDeclaredField("registeredServices");
-            return (ConcurrentHashMap<String, Webservice>) privateStringField.get(this);
+            return (HashMap<String, Webservice>) privateStringField.get(this);
         } 
         catch (NoSuchFieldException e) 
         {
@@ -70,18 +61,20 @@ public class DynamixCoapServer extends CoapServerApplication
         {
             e.printStackTrace();
         }
-        return new ConcurrentHashMap<String, Webservice>();
+        return new HashMap<String, Webservice>();
     }
 
     public void refreshRootService() 
     {
-        removeService("/.well-known/core");
+        //The API seems to have changed and this next line is no longer allowed...
+        //this.
         registerService(new WellKnownCoreResource(getRegisteredServices()));
     }
 
-	public int getServerPort() 
+	public int getServerPort()
 	{
-		return port;
+        //why does a server application not have any method to return the port...?
+		return Constants.COAP_PORT;
 	}
 
 }

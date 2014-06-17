@@ -29,7 +29,6 @@ import android.util.Log;
 import com.google.common.util.concurrent.SettableFuture;
 
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.ncoap.application.server.webservice.AcceptedContentFormatNotSupportedException;
 import de.uniluebeck.itm.ncoap.application.server.webservice.NotObservableWebservice;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
@@ -37,8 +36,6 @@ import de.uniluebeck.itm.ncoap.message.InvalidHeaderException;
 import de.uniluebeck.itm.ncoap.message.InvalidMessageException;
 import de.uniluebeck.itm.ncoap.message.MessageCode;
 import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
-import de.uniluebeck.itm.ncoap.message.options.Option;
-import de.uniluebeck.itm.ncoap.message.options.UintOption;
 
 public class NotObservableDynamixWebservice  extends NotObservableWebservice<ContextEvent> 
 {
@@ -80,14 +77,14 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
 	            }
 	            else
 	            {
-	                responseFuture.set(new CoapResponse(MessageCode.Name.METHOD_NOT_ALLOWED_405));
+	                responseFuture.set(new CoapResponse(request.getMessageTypeName(), MessageCode.Name.METHOD_NOT_ALLOWED_405));
 	            }
 	        }
 	        catch(Exception e)
 	        {
 	            try {
-					responseFuture.set(new CoapResponse(MessageCode.Name.INTERNAL_SERVER_ERROR_500));
-				} catch (InvalidHeaderException e1) {
+					responseFuture.set(new CoapResponse(request.getMessageTypeName(), MessageCode.Name.INTERNAL_SERVER_ERROR_500));
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -107,15 +104,15 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
             //this.setResourceStatus(newValue);
 
             //create response
-            response = new CoapResponse(MessageCode.Name.CHANGED_204);
-            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+            response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CHANGED_204);
+            response.setContent(createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8), ContentFormat.TEXT_PLAIN_UTF8);
 
             responseFuture.set(response);
 
         }
         catch(Exception e)
         {
-            response = new CoapResponse(MessageCode.Name.BAD_REQUEST_400);
+            response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.BAD_REQUEST_400);
             response.setContent(e.getMessage().getBytes(Charset.forName("UTF-8")));
             responseFuture.set(response);	
         }
@@ -131,9 +128,9 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
 	        if(acceptOptions.isEmpty())
 	        {
 	        	Log.d(TAG, "isempty");
-	            CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	            CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CONTENT_205);
 	            Log.d(TAG, "line2");
-	            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+	            response.setContent(createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8), ContentFormat.TEXT_PLAIN_UTF8);
 	            Log.d(TAG, "line3");
 	            Log.d(TAG, "line4");
 	            responseFuture.set(response);
@@ -149,7 +146,7 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
 	            //the requested mediatype is supported
 	            if(payload != null)
 	            {
-	                CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	                CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CONTENT_205);
 	                response.setContent(payload, acceptedMediaType);
 	                responseFuture.set(response);
 	            }
@@ -161,7 +158,7 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
 		}
 
         //This is only reached if all accepted mediatypes are not supported!
-        CoapResponse response = new CoapResponse(MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
+        CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
         responseFuture.set(response);
 		
 	}
@@ -177,14 +174,14 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
     		if(event.getExpireTime().before(d))
     		{
 		    	Log.d(TAG, "mediatype="+mediaType);
-				if(mediaType==ContentFormat.Name.APP_XML)
+				if(mediaType==ContentFormat.APP_XML)
 				{
 					Log.d(TAG, "formatxml");
 					StringBuffer payload = new StringBuffer();
 					payload.append(event.getStringRepresentation("XML"));
 					return payload.toString().getBytes(Charset.forName("UTF-8"));
 				}
-				if(mediaType == ContentFormat.Name.TEXT_PLAIN_UTF8)
+				if(mediaType == ContentFormat.TEXT_PLAIN_UTF8)
 				{
 					Log.d(TAG, "format is Plain Stuff");
 					String payload =event.getStringRepresentation("text/plain"); 
@@ -212,7 +209,14 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
     }
 
 
-	@Override
+    @Override
+    public byte[] getEtag(long contentFormat)
+    {
+        //TODO: I do not know what this method even does...
+        return new byte[0];
+    }
+
+    @Override
 	public void updateEtag(ContextEvent resourceStatus) {
 		// TODO Auto-generated method stub
 		
@@ -220,15 +224,7 @@ public class NotObservableDynamixWebservice  extends NotObservableWebservice<Con
 
 
 	@Override
-	public boolean allowsDelete() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public byte[] getSerializedResourceStatus(long contentFormatNumber)
-			throws AcceptedContentFormatNotSupportedException {
+	public byte[] getSerializedResourceStatus(long contentFormatNumber){
 		// TODO Auto-generated method stub
 		return null;
 	}

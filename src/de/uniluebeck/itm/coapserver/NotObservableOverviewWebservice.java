@@ -21,7 +21,6 @@ import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
-import de.uniluebeck.itm.ncoap.application.server.webservice.AcceptedContentFormatNotSupportedException;
 import de.uniluebeck.itm.ncoap.application.server.webservice.NotObservableWebservice;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.CoapResponse;
@@ -30,8 +29,6 @@ import de.uniluebeck.itm.ncoap.message.InvalidMessageException;
 import de.uniluebeck.itm.ncoap.message.MessageCode;
 import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
 import de.uniluebeck.itm.ncoap.message.options.InvalidOptionException;
-import de.uniluebeck.itm.ncoap.message.options.Option;
-import de.uniluebeck.itm.ncoap.message.options.UintOption;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -78,14 +75,14 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
     				String ctype = scanConfig.getString("context_type");
     				Log.d(TAG, scanConfig.getString("context_type"));
     				Log.d(TAG, ctype);
-    				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+    				final HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
     				ContextType type = (ContextType)contexttypes.get(ctype);
 		            if(type!=null)
 		            {
 		            	Log.d(TAG, "type!=null");
 		            	NotificationService.requestContext(ctype);
-			            response = new CoapResponse(MessageCode.Name.CHANGED_204);
-			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+			            response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CHANGED_204);
+			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8), ContentFormat.TEXT_PLAIN_UTF8);
 
 		
 			            responseFuture.set(response);
@@ -98,14 +95,14 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
     			if(scanConfig.getString("action_type").equals("unsubscribe") && scanConfig.containsKey("context_type"))
     			{
     				String ctype = scanConfig.getString("context_type");
-    				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+    				final HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
     				ContextType type = (ContextType)contexttypes.get(ctype);
 		            if(type!=null)
 		            {
 		            	Log.d(TAG, "type!=null");
 		            	NotificationService.requestUnsubscribeContext(ctype);
-			            response = new CoapResponse(MessageCode.Name.CHANGED_204);
-			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+			            response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CHANGED_204);
+			            response.setContent(createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8), ContentFormat.TEXT_PLAIN_UTF8);
 		
 			            responseFuture.set(response);
 		            }
@@ -117,8 +114,8 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
         }
         catch(Exception e)
         {
-            response = new CoapResponse(MessageCode.Name.BAD_REQUEST_400);
-            response.setContent(e.getMessage().getBytes(Charset.forName("UTF-8")), ContentFormat.Name.TEXT_PLAIN_UTF8);
+            response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.BAD_REQUEST_400);
+            response.setContent(e.getMessage().getBytes(Charset.forName("UTF-8")), ContentFormat.TEXT_PLAIN_UTF8);
             responseFuture.set(response);
         }
 		
@@ -134,8 +131,8 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 	        if(acceptOptions.isEmpty())
 	        {
 	        	Log.d(TAG, "accept optioon is empty");
-	            CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
-	            response.setContent(createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8), ContentFormat.Name.TEXT_PLAIN_UTF8);
+	            CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CONTENT_205);
+	            response.setContent(createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8), ContentFormat.TEXT_PLAIN_UTF8);
 	            responseFuture.set(response);
 	        }
 	
@@ -147,7 +144,7 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 	            //the requested mediatype is supported
 	            if(payload != null)
 	            {
-	                CoapResponse response = new CoapResponse(MessageCode.Name.CONTENT_205);
+	                CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.CONTENT_205);
 	                response.setContent(payload, acceptedMediaType);
 	                responseFuture.set(response);
 	            }
@@ -159,7 +156,7 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 		}
 
         //This is only reached if all accepted mediatypes are not supported!
-        CoapResponse response = new CoapResponse(MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
+        CoapResponse response = new CoapResponse(request.getMessageTypeName(), MessageCode.Name.UNSUPPORTED_CONTENT_FORMAT_415);
         responseFuture.set(response);
 		
 	}
@@ -187,14 +184,14 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 	            }
 	            else
 	            {
-	                responseFuture.set(new CoapResponse(MessageCode.Name.METHOD_NOT_ALLOWED_405));
+	                responseFuture.set(new CoapResponse(request.getMessageTypeName(), MessageCode.Name.METHOD_NOT_ALLOWED_405));
 	            }
 	        }
 	        catch(Exception e)
 	        {
 	            try {
-					responseFuture.set(new CoapResponse(MessageCode.Name.INTERNAL_SERVER_ERROR_500));
-				} catch (InvalidHeaderException e1) {
+					responseFuture.set(new CoapResponse(request.getMessageTypeName(), MessageCode.Name.INTERNAL_SERVER_ERROR_500));
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -209,20 +206,21 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 		
 	}
 
-	@Override
+    @Override
+    public byte[] getEtag(long contentFormat)
+    {
+        //TODO: I have no idea what this method even does...
+        return new byte[0];
+    }
+
+    @Override
 	public void updateEtag(String resourceStatus) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean allowsDelete() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public byte[] getSerializedResourceStatus(long contentFormatNumber)	throws AcceptedContentFormatNotSupportedException {
+	public byte[] getSerializedResourceStatus(long contentFormatNumber){
 		// TODO Auto-generated method stub
 		return null;
 	}

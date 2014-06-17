@@ -21,7 +21,7 @@ import android.provider.Settings.Secure;
 import com.google.common.collect.HashBiMap;
 import de.uniluebeck.itm.ncoap.message.CoapRequest;
 import de.uniluebeck.itm.ncoap.message.options.ContentFormat;
-import de.uniluebeck.itm.ncoap.message.options.Option;
+import de.uniluebeck.itm.ncoap.message.options.*;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -82,27 +82,6 @@ public class Utils {
     }
 
     /**
-     * Parse x-www-form-urlencoded parameters from request query
-     * @param options Options List from CoAP request
-     * @return parsed Parameters
-     */
-    public static Map<String, String> parseParams(List<Option> options) {
-        Map<String, String> result = new HashMap<String, String>();
-        for(Option o : options) {
-            String param = o.getDecodedValue().toString();
-            int i = param.indexOf('=');
-            try {
-                String key = param.substring(0,i).toLowerCase();
-                String value = URLDecoder.decode(param.substring(i+1), "utf8");
-                result.put(key, value);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    /**
      * Returns a unique device id, which is stable across restarts
      * @param context
      * @return
@@ -116,18 +95,14 @@ public class Utils {
     {
         simpleDateFormat.setTimeZone(tz);
     }
-    public static String toISODate(Date date) {
-        if(date == null) return "";
-        return simpleDateFormat.format(date);
-    }
 
 
     public static final HashBiMap<String, Long> MEDIA_TYPE_MAP = HashBiMap.create();
     static 
     {
-        MEDIA_TYPE_MAP.put("RDF/XML", ContentFormat.Name.APP_RDF_XML);
-        MEDIA_TYPE_MAP.put("TURTLE", ContentFormat.Name.APP_TURTLE);
-        MEDIA_TYPE_MAP.put("N3", ContentFormat.Name.APP_N3);
+        MEDIA_TYPE_MAP.put("RDF/XML", ContentFormat.APP_RDF_XML);
+        MEDIA_TYPE_MAP.put("TURTLE", ContentFormat.APP_TURTLE);
+        MEDIA_TYPE_MAP.put("N3", ContentFormat.APP_N3);
     }
 
     public static final HashMap<Long,Long> COPPER_ACCEPT_MAP = new HashMap<Long, Long>();

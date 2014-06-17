@@ -42,9 +42,9 @@
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.support.NotificationService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartService"></service>
        <service android:name="de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager"></service>
-       <service android:name="de.uniluebeck.itm.dynamixbridge.networking.DiscoveryService"></service>
-       <service android:name="de.uniluebeck.itm.dynamixbridge.networking.WifiDirectService"></service>
-       <service android:name="de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient"></service>
+       <service android:name=".networking.DiscoveryService"></service>
+       <service android:name=".networking.WifiDirectService"></service>
+       <service android:name=".ssp.ssp.DynamixBridgeCoapClient"></service>
        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl"/>
   
        <receiver android:name="de.uniluebeck.itm.dynamixsspbridge.core.StartUp">
@@ -52,7 +52,7 @@
             	<action android:name="android.intent.action.BOOT_COMPLETED"/>
         	</intent-filter>
     	</receiver>
-    	<receiver android:name="de.uniluebeck.itm.dynamixbridge.networking.WifiListener" >
+    	<receiver android:name=".networking.WifiListener" >
             <intent-filter>
                 <action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
                 <action android:name="android.net.wifi.STATE_CHANGE" />

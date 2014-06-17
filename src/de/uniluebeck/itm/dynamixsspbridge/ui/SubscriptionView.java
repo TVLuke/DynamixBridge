@@ -16,19 +16,16 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.ui;
 
+import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.uniluebeck.itm.coapserver.CoapServerManager;
-import de.uniluebeck.itm.coapserver.Utils;
-import de.uniluebeck.itm.dynamixbridge.ssp.DynamixBridgeCoapClient.SimpleResponseProcessor;
 import de.uniluebeck.itm.dynamixsspbridge.R;
 import de.uniluebeck.itm.dynamixsspbridge.core.StartService;
 import de.uniluebeck.itm.dynamixsspbridge.core.UpdateManager;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
-import de.uniluebeck.itm.dynamixsspbridge.support.NotificationService;
 import de.uniluebeck.itm.ncoap.application.client.CoapClientApplication;
 import de.uniluebeck.itm.ncoap.application.client.CoapResponseProcessor;
 import de.uniluebeck.itm.ncoap.communication.reliability.outgoing.EmptyAcknowledgementProcessor;
@@ -50,11 +47,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -64,7 +58,7 @@ public class SubscriptionView extends Activity
 	private final String TAG ="SSPBridge";
 	private static final String PREFS = Constants.PREFS;
 	private static Context ctx;
-	private static ConcurrentHashMap<String, ContextType> list;
+	private static HashMap<String, ContextType> list;
 	static ContextTypeListViewAdapter adapter;
 
 	private UIUpdater updater;
@@ -191,7 +185,7 @@ public class SubscriptionView extends Activity
 	      					byte[] bytes = "lol".getBytes();
 	      					coapRequest.setContent(bytes);
 	      					
-	      					client.writeCoapRequest(coapRequest, new SimpleResponseProcessor());
+	      					client.sendCoapRequest(coapRequest, new SimpleResponseProcessor(), new InetSocketAddress(targetURI.toString(), targetURI.getPort()));
 	      				}
 	      				catch(Exception e)
 	      				{
@@ -217,19 +211,19 @@ public class SubscriptionView extends Activity
 		{
 		    Log.d(TAG, "Received Response: " + coapResponse);
 		}
-		
-		@Override
-		public void processEmptyAcknowledgement(InternalEmptyAcknowledgementReceivedMessage message) 
-		{
-			Log.d(TAG, "Received empty ACK: " + message);
-		}
-		
-		@Override
-		public void processRetransmissionTimeout(InternalRetransmissionTimeoutMessage timeoutMessage) 
-		{
-			Log.d(TAG, "Transmission timed out: " + timeoutMessage);
-		}
-	}
+
+        @Override
+        public void processEmptyAcknowledgement()
+        {
+            Log.d(TAG, "Received empty ACK: ");
+        }
+
+        @Override
+        public void processRetransmissionTimeout()
+        {
+            Log.d(TAG, "Transmission timed out: ");
+        }
+    }
 	
 	private class  UIUpdater implements Runnable
 	{

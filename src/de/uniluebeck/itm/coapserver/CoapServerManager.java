@@ -77,17 +77,12 @@ public class CoapServerManager extends Service
 
 	public static void startServer(String servername)
 	{
-		startServer(servername, Constants.COAP_PORT);
-	}
-	
-
-	public static void startServer(String servername, int port)
-	{
 		Log.d(TAG, "Start Server "+servername);
 		try
 		{
-			DynamixCoapServer server = new DynamixCoapServer(port);
-			Log.d(TAG, "Server started and listening on port " + server.getServerPort());
+
+			DynamixCoapServer server = new DynamixCoapServer();
+			Log.d(TAG, "Server started");
 			server.registerService(new NotObservableOverviewWebservice("/service/dynamix/contexttypes"," "));
 			serverList.put("s1", server);
 		}
@@ -104,7 +99,7 @@ public class CoapServerManager extends Service
 		for(int i=0; i<serverList.size(); i++)
 		{
 			DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[i]));
-			ConcurrentHashMap<String, Webservice> services = s.getRegisteredServices();
+			HashMap<String, Webservice> services = s.getRegisteredServices();
 			Set<String> keys = services.keySet();
 			Iterator<String> it = keys.iterator();
 			while(it.hasNext())
@@ -122,7 +117,7 @@ public class CoapServerManager extends Service
 	{
 		Log.d(TAG, "Stop Server "+serverName);
 		DynamixCoapServer s = serverList.get(serverName);
-		ConcurrentHashMap<String, Webservice> services = s.getRegisteredServices();
+		HashMap<String, Webservice> services = s.getRegisteredServices();
 		Set<String> keys = services.keySet();
 		Iterator<String> it = keys.iterator();
 		while(it.hasNext())
@@ -176,7 +171,8 @@ public class CoapServerManager extends Service
 				}
 				catch(Exception e)
 				{
-					Log.e(TAG, "was get da bitte?"+e.getLocalizedMessage()+" "+e.getStackTrace().toString());
+					Log.e(TAG, "was get da bitte?"+e.getLocalizedMessage()+" ");
+                    e.printStackTrace();
 					removeService(contexttype);
 				}
 				
@@ -197,8 +193,9 @@ public class CoapServerManager extends Service
 			DynamixCoapServer s = serverList.get((String) (serverList.keySet().toArray()[0]));
 			contexttype.deactivate();
 			contexttype.getManType().deactivate();
-			s.removeService("/"+contexttype.getName().replace(".", "/"));
-			s.removeService("/"+contexttype.getName().replace(".", "/")+"/man");
+            //TODO: this used to work... but removeService is no longer a method of CoapServerApplication
+			//s.removeService("/"+contexttype.getName().replace(".", "/"));
+			//s.removeService("/"+contexttype.getName().replace(".", "/")+"/man");
 		}
 	}
 	

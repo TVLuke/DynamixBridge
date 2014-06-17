@@ -16,6 +16,7 @@
 
 package de.uniluebeck.itm.dynamixsspbridge.dynamix;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -46,7 +47,7 @@ public class DynamixConnectionService extends Service
 	public static DynamixConnectionService ctx;
 	private static IDynamixFacade dynamix;
 
-	private static ConcurrentHashMap<String, ContextType> allContextTypes =  new ConcurrentHashMap<String, ContextType>();
+	private static HashMap<String, ContextType> allContextTypes =  new HashMap<String, ContextType>();
 	
 	@Override
 	public IBinder onBind(Intent arg0) 
@@ -293,36 +294,43 @@ public class DynamixConnectionService extends Service
 			/*
 			 * Log some information about the incoming event
 			 */
-			Log.i(TAG, "A1 - onContextEvent received from plugin: " + event.getEventSource());
-			Log.i(TAG, "A1 - -------------------");
-			Log.i(TAG, "A1 - Event context type: " + event.getContextType());
-			Log.i(TAG, "A1 - Event timestamp " + event.getTimeStamp());
-			if (event.expires())
-			{
-				Log.i(TAG, "A! - Event expires: "+event.expires());
-				Log.i(TAG, "A1 - Event expires at " + event.getExpireTime());
-			}
-			else
-			{
-				Log.i(TAG, "A1 - Event does not expire");
-			}
-			if (event.hasIContextInfo()) 
-			{
-				Log.i(TAG, "A1 - Event contains native IContextInfo: " + event.getIContextInfo());
-			}
-			else
-			{
-				Log.i(TAG, "A1 - NO CONTEXT INFO ");
-			}
-			for (String format : event.getStringRepresentationFormats()) 
-			{
-				Log.i(TAG,
-						"Event string-based format: " + format + " contained data: "
-								+ event.getStringRepresentation(format));
-				
-			}
-			ContextType type = allContextTypes.get(event.getContextType());
-			type.setCurrentEvent(event);
+            try
+            {
+                Log.i(TAG, "A1 - onContextEvent received from plugin: " + event.getEventSource());
+                Log.i(TAG, "A1 - -------------------");
+                Log.i(TAG, "A1 - Event context type: " + event.getContextType());
+                Log.i(TAG, "A1 - Event timestamp " + event.getTimeStamp());
+                if (event.expires())
+                {
+                    Log.i(TAG, "A! - Event expires: "+event.expires());
+                    Log.i(TAG, "A1 - Event expires at " + event.getExpireTime());
+                }
+                else
+                {
+                    Log.i(TAG, "A1 - Event does not expire");
+                }
+                if (event.hasIContextInfo())
+                {
+                    Log.i(TAG, "A1 - Event contains native IContextInfo: " + event.getIContextInfo());
+                }
+                else
+                {
+                    Log.i(TAG, "A1 - NO CONTEXT INFO ");
+                }
+                for (String format : event.getStringRepresentationFormats())
+                {
+                    Log.i(TAG,
+                            "Event string-based format: " + format + " contained data: "
+                                    + event.getStringRepresentation(format));
+
+                }
+                    ContextType type = allContextTypes.get(event.getContextType());
+                    type.setCurrentEvent(event);
+            }
+            catch(Exception e)
+            {
+                //catching all the anoying exceptions from dynamix because of missing context classes
+            }
 
 		}
 
@@ -391,7 +399,7 @@ public class DynamixConnectionService extends Service
 		//nope...
 	}
 	
-	public static ConcurrentHashMap<String, ContextType> updateContextTypes()
+	public static HashMap<String, ContextType> updateContextTypes()
 	{
 		Log.d(TAG, "getallcontexttypes");
 		if (dynamix != null) 
@@ -466,7 +474,7 @@ public class DynamixConnectionService extends Service
 		return allContextTypes;
 	}
 	
-	public static ConcurrentHashMap<String, ContextType> getContextTypes()
+	public static HashMap<String, ContextType> getContextTypes()
 	{
 		return allContextTypes;
 	}

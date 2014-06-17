@@ -69,7 +69,7 @@ public class ContextItemView extends Activity
         final SharedPreferences prefs = ctx.getSharedPreferences(PREFS, 0);
         Intent i = getIntent();
         final int position = i.getExtras().getInt("position");
-        final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+        final HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
         final ContextType contextType = contexttypes.get((String) contexttypes.keySet().toArray()[position]);
 		name = contextType.getName();
         friendlyname = contextType.getUserFriendlyName();

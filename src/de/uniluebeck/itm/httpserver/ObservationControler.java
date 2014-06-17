@@ -17,6 +17,7 @@ package de.uniluebeck.itm.httpserver;
  */
 
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -56,15 +57,15 @@ public class ObservationControler
 		Long mt = null;
 		if(f.equals(Format.TXT))
 		{
-			mt = ContentFormat.Name.TEXT_PLAIN_UTF8;
+			mt = ContentFormat.TEXT_PLAIN_UTF8;
 		}
 		if(f.equals(Format.JSON))
 		{
-			mt = ContentFormat.Name.APP_JSON;
+			mt = ContentFormat.APP_JSON;
 		}
 		if(f.equals(Format.XML))
 		{
-			mt = ContentFormat.Name.APP_XML;
+			mt = ContentFormat.APP_XML;
 		}
 		Bundle scanConfig = ManagerManager.parseRequest(MessageCode.Name.PUT, payload, mt);
 		if(scanConfig.containsKey("action_type"))
@@ -76,7 +77,7 @@ public class ObservationControler
 				Log.d(TAG, scanConfig.getString("context_type"));
 				Log.d(TAG, ctype);
 				Log.d(TAG, "getall");
-				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+				final HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
 		        ContextType type = (ContextType)contexttypes.get(ctype);
 		        if(type!=null)
 		        {
@@ -97,7 +98,7 @@ public class ObservationControler
 				Log.d(TAG, scanConfig.getString("context_type"));
 				Log.d(TAG, ctype);
 				Log.d(TAG, "getall");
-				final ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+				final HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
 		        ContextType type = (ContextType)contexttypes.get(ctype);
 		        if(type!=null)
 		        {

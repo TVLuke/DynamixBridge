@@ -60,7 +60,7 @@ public class ContextUnsubscriptionRequested extends Activity
 		String contextType = intent.getStringExtra("contexttype");
    		
 		Log.d(TAG, contextType+"");
-		ConcurrentHashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
+		HashMap<String, ContextType> contexttypes = UpdateManager.getContextTypes();
 		final ContextType type = contexttypes.get(contextType);
 		if(type!=null)
 		{

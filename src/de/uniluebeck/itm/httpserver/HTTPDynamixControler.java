@@ -73,21 +73,24 @@ public class HTTPDynamixControler
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false);
+            Log.d(TAG, "ok, calling createPayloadfromactualstatus now...");
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.APP_XML, contexttype, false);
+            Log.d(TAG, "got a payload back...");
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());
 			response.setBody(new String(r));			
 			response.setResponseCreated();
+            Log.d(TAG, "done with creating the response... should be all good.");
 		}
-		
+
 	}
 	
 	public void update(Request request, Response response)
@@ -106,15 +109,15 @@ public class HTTPDynamixControler
 		Long mt = null;
 		if(f.equals(Format.TXT))
 		{
-			mt = ContentFormat.Name.TEXT_PLAIN_UTF8;
+			mt = ContentFormat.TEXT_PLAIN_UTF8;
 		}
 		if(f.equals(Format.JSON))
 		{
-			mt = ContentFormat.Name.APP_JSON;
+			mt = ContentFormat.APP_JSON;
 		}
 		if(f.equals(Format.XML))
 		{
-			mt = ContentFormat.Name.APP_XML;
+			mt = ContentFormat.APP_XML;
 		}
 		scanConfig = ManagerManager.parseRequest(MessageCode.Name.POST, payload, mt);
 		Log.d(TAG, "x");
@@ -126,14 +129,14 @@ public class HTTPDynamixControler
 		}
 		if(format.equals(Format.TXT))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.TEXT_PLAIN_UTF8, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.TEXT_PLAIN_UTF8, contexttype, false);
 			response.setContentType(Format.TXT);
 			response.setBody(new String(r));			
 			response.setResponseCreated();
 		}
 		if(format.equals(Format.XML))
 		{
-			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.Name.APP_XML, contexttype, false);
+			byte[] r = ManagerManager.createPayloadFromAcutualStatus(ContentFormat.APP_XML, contexttype, false);
 			response.setContentType(Format.XML);
 			response.addHeader("version", "1.0");
 			response.setResponseProcessor(ResponseProcessors.xml());

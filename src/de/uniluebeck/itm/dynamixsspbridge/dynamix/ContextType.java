@@ -22,10 +22,9 @@ import java.util.Date;
 import org.ambientdynamix.api.application.ContextEvent;
 
 
-import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
-import de.uniluebeck.itm.dynamixbridge.accesscontrol.Tolken;
+import de.uniluebeck.itm.dynamixsspbridge.accesscontrol.Tolken;
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.httpserver.HTTPDynamixControler;

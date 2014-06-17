@@ -18,21 +18,20 @@ package de.uniluebeck.itm.dynamixsspbridge.core;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.ambientdynamix.api.application.ContextEvent;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import de.uniluebeck.itm.coapserver.CoapServerManager;
 import de.uniluebeck.itm.coapserver.Utils;
-import de.uniluebeck.itm.dynamixbridge.networking.DiscoveryService;
+import de.uniluebeck.itm.dynamixsspbridge.networking.DiscoveryService;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.DynamixConnectionService;
 import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
@@ -58,7 +57,7 @@ public class UpdateManager extends IntentService
 	private static int countdowntorestart=1;
 	private static int littlecounter = 0;
 	
-	private static ConcurrentHashMap<String, ContextType> contexttypes = new ConcurrentHashMap<String, ContextType>();
+	private static HashMap<String, ContextType> contexttypes = new HashMap<String, ContextType>();
 	
 	public UpdateManager() 
 	{
@@ -168,11 +167,10 @@ public class UpdateManager extends IntentService
 			{
 				//Log.i(TAG, "dynamix is connected");
 				//OK, we seem to have a connected Dynmix
-				Set<String> keyset = contexttypes.keySet();
-				Iterator<String> it = keyset.iterator();
-				while(it.hasNext())
+				Iterator<String> keyset = contexttypes.keySet().iterator();
+				while(keyset.hasNext())
 				{
-					String key = it.next();
+					String key = keyset.next();
 					boolean shouldbeactive= prefs.getBoolean(key, false);
 					ContextType ct = contexttypes.get(key);
 					if(shouldbeactive)
@@ -205,7 +203,8 @@ public class UpdateManager extends IntentService
 	            public void run() 
 	            {
 	        		//TODO: Update descriptions of context and stuff...
-	            	Iterator<String> itx = contexttypes.keySet().iterator();
+                    Iterator<String> itx = contexttypes.keySet().iterator();
+	            	//Iterator<String> itx = contexttypes.keySet().iterator();
 	            	while(itx.hasNext())
 	            	{
 	            		ContextType ct = contexttypes.get(itx.next());
@@ -260,7 +259,7 @@ public class UpdateManager extends IntentService
 		}
 	}
 	
-	public static ConcurrentHashMap<String, ContextType> getContextTypes()
+	public static HashMap<String, ContextType> getContextTypes()
 	{
 		return contexttypes;
 	}

@@ -59,7 +59,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
- * With more then only coap being suported we actually need to have a unified interface for all the Managers and then check which 
+ * With more then only coap being supported we actually need to have a unified interface for all the Managers and then check which
  * things are activated for what and act accordingly...
  *
  * @author lukas
@@ -99,17 +99,13 @@ public class ManagerManager extends Service
 		super.onDestroy();	
 	}
 	
-	public static void startServer(String servername)
+	public static void startServer(final String servername)
 	{
 		 Log.d(TAG, "ManagerManager startServer");
-		CoapServerManager.startServer(servername);
-		HTTPServerManager.startServer(servername);
-	}
-	
-	public static void startServer(String servername, int port)
-	{
-		 Log.d(TAG, "ManagerManager startServe");
-		
+
+                CoapServerManager.startServer(servername);
+                HTTPServerManager.startServer(servername);
+
 	}
 	
 	public static void stopAllServers() throws InterruptedException
@@ -117,12 +113,6 @@ public class ManagerManager extends Service
 		 Log.e(TAG, "ManagerManager stopAllServers");
 		CoapServerManager.stopAllServers();
 		HTTPServerManager.stopAllServers();
-	}
-	
-	public static void stopServer(String serverName)
-	{
-		 Log.e(TAG, "ManagerManager stopServer");
-
 	}
 	
 	public static void addService(ContextType contexttype, int updateintervall)
@@ -177,7 +167,7 @@ public class ManagerManager extends Service
 		if(code == MessageCode.Name.POST || code == MessageCode.Name.PUT)
 		{
 			Log.d(TAG, "Post or Put");
-			if(type ==  ContentFormat.Name.TEXT_PLAIN_UTF8)
+			if(type ==  ContentFormat.TEXT_PLAIN_UTF8)
 			{
 				Log.d(TAG, "MediaType Plain Text");
 				if(payload.equals(""))
@@ -186,11 +176,10 @@ public class ManagerManager extends Service
 				}
 				else
 				{
-					Bundle request = parsePlainTextRequest(payload);
-					return request;
+					return parsePlainTextRequest(payload);
 				}
 			}
-			if(type ==  ContentFormat.Name.APP_JSON)
+			if(type ==  ContentFormat.APP_JSON)
 			{
 				Log.d(TAG, "MediaType JSON");
 				if(payload.equals(""))
@@ -984,14 +973,14 @@ public class ManagerManager extends Service
         	Log.d(TAG, "Difference in minutes="+(dif1/1000)/60);
         	Log.d(TAG, "Difference in hours="+((dif1/1000)/60)/60);
         		Set<String> formats = event.getStringRepresentationFormats();
-        		if(mediaType==ContentFormat.Name.TEXT_PLAIN_UTF8)
+        		if(mediaType==ContentFormat.TEXT_PLAIN_UTF8)
         		{
         			//TODO: This is evil. And Wroooong. And Evil. And Evil.
-        			mediaType= ContentFormat.Name.APP_XML;
+        			mediaType= ContentFormat.APP_XML;
         		}
         			
 		    	Log.d(TAG, "mediatype="+mediaType);				
-				if(mediaType==ContentFormat.Name.APP_XML)
+				if(mediaType==ContentFormat.APP_XML)
 				{
 					Log.d(TAG, "formatxml");
 					if(formats.contains("RDF/XML"))
@@ -1023,11 +1012,10 @@ public class ManagerManager extends Service
 					}
 					else
 					{
-						if(formats.contains("XML"))
+                        Log.d(TAG, "else...");
+						if(true)
 						{
 							Log.d(TAG, "formats contained xml...");
-							StringBuffer payload = new StringBuffer();
-							String xmldata = event.getStringRepresentation("XML");
 							//TODO: here be some wrapping
 							String xmlresult =  "<contextEvent>\n" +
 												"	<contextType>\n" +
@@ -1044,6 +1032,12 @@ public class ManagerManager extends Service
 												"		</source>\n"+
 												"	</contextType>\n" +
 												"	<contextData>\n";
+                            Log.d(TAG, "-----");
+                            Log.d(TAG, ""+event.getStringRepresentationFormats().size());
+                            for(String f : event.getStringRepresentationFormats())
+                            {
+                                Log.d(TAG, f);
+                            }
 												if(event.getStringRepresentation("XML").endsWith("\n"))
 												{
 													xmlresult=xmlresult+"		"+event.getStringRepresentation("XML").replace("\n", "\n		");
@@ -1054,13 +1048,13 @@ public class ManagerManager extends Service
 												}
 												xmlresult=xmlresult+"	</contextData>\n"+
 												"</contextEvent>";
-							payload.append(xmlresult);
-							return payload.toString();
+                            Log.d(TAG, xmlresult);
+							return xmlresult;
 						}
 					}
 
 				}
-				if(mediaType == ContentFormat.Name.TEXT_PLAIN_UTF8)
+				if(mediaType == ContentFormat.TEXT_PLAIN_UTF8)
 				{
 					Log.d(TAG, "format is Plain Stuff");
 					if(formats.contains("text/plain"))
@@ -1070,7 +1064,7 @@ public class ManagerManager extends Service
 						return payload.toString();
 					}
 				}
-				if(mediaType == ContentFormat.Name.APP_JSON)
+				if(mediaType == ContentFormat.APP_JSON)
 				{
 					
 					Log.d(TAG, "format is JSON ");
@@ -1106,21 +1100,21 @@ public class ManagerManager extends Service
 						}
 					}
 				}
-				if(mediaType == ContentFormat.Name.APP_N3)
+				if(mediaType == ContentFormat.APP_N3)
 				{
 					if(formats.contains("N3"))
 					{
 						
 					}
 				}
-				if(mediaType== ContentFormat.Name.APP_TURTLE)
+				if(mediaType== ContentFormat.APP_TURTLE)
 				{
 					if(formats.contains("Turtle"))
 					{
 						
 					}
 				}
-				if(mediaType == ContentFormat.Name.APP_SHDT)
+				if(mediaType == ContentFormat.APP_SHDT)
 				{
 					if(formats.contains("SHDT"))
 					{
@@ -1264,13 +1258,14 @@ public class ManagerManager extends Service
 		else
 		{
 			String payload = createStringPayloadFromAcutualStatus(mediaType, contextType.getCurrentEvent(), contextType);
+            Log.d(TAG, "got String payload from actual status, now create a byte array");
 			return payload.getBytes(Charset.forName("UTF-8"));
 		}
 	}
 	
 	public static byte[] createContextTypeListResponse(String format)
 	{
-		long mediaType = ContentFormat.Name.APP_XML;
+		long mediaType = ContentFormat.APP_XML;
 		if(format!=null)
 		{
 			return createContextTypeListResponse(mediaType);			
@@ -1284,8 +1279,8 @@ public class ManagerManager extends Service
 	public static byte[] createContextTypeListResponse(long mediaType)
 	{
 		String payload = new String();
-		ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
-		if(mediaType==ContentFormat.Name.APP_XML)
+		HashMap<String, ContextType> types = UpdateManager.getContextTypes();
+		if(mediaType==ContentFormat.APP_XML)
 		{
 			payload ="<contexttypes>\n";
 			for(int i=0; i<types.size(); i++)
@@ -1309,7 +1304,7 @@ public class ManagerManager extends Service
 	    	}
 			payload=payload+"</contexttypes>";
 		}
-		if(mediaType == ContentFormat.Name.TEXT_PLAIN_UTF8)
+		if(mediaType == ContentFormat.TEXT_PLAIN_UTF8)
 		{
 			for(int i=0; i<types.size(); i++)
 	    	{
@@ -1320,7 +1315,7 @@ public class ManagerManager extends Service
 	    		payload=payload+"  "+type.getDescription()+"\n";
 	    	}
 		}
-		if(mediaType == ContentFormat.Name.APP_JSON)
+		if(mediaType == ContentFormat.APP_JSON)
 		{
 			payload="currently not supported";
 		}

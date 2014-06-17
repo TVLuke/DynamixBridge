@@ -37,12 +37,12 @@ import android.widget.TextView;
 public class ContextTypeListViewAdapter extends BaseAdapter 
 {
 
-	ConcurrentHashMap<String, ContextType> contexttypes;
+	HashMap<String, ContextType> contexttypes;
 	private static final String PREFS = Constants.PREFS;
 	LayoutInflater inflater;
 	Context context;
 	
-	public ContextTypeListViewAdapter(Context context, ConcurrentHashMap<String, ContextType> contexttypes)
+	public ContextTypeListViewAdapter(Context context, HashMap<String, ContextType> contexttypes)
 	{
 		this.contexttypes=contexttypes;
 		this.context=context;

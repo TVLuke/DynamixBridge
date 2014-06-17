@@ -17,7 +17,9 @@
 
 package de.uniluebeck.itm.httpserver;
 
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
@@ -85,7 +87,7 @@ public class HTTPServerManager extends Service
 				public void run()
 				{
 					UpdateManager.updateList();
-					ConcurrentHashMap<String, ContextType> types = UpdateManager.getContextTypes();
+					HashMap<String, ContextType> types = UpdateManager.getContextTypes();
 					while(types.size()<1)//needed for the workaround... otherwise the server starts before any context types are known. Even this only kind of works.
 					{
 						types = UpdateManager.getContextTypes();
@@ -105,9 +107,10 @@ public class HTTPServerManager extends Service
 					//TODO: this is a capitulation on the limits of the implementation of RestExpress... shit man.
 					types = UpdateManager.getContextTypes();
 					Log.d(TAG, "HTTP "+types.size()+" go.");
-					for(int j=0; j<types.size(); j++)
+                    Iterator<String> keys = types.keySet().iterator();
+					while(keys.hasNext())
 			    	{
-			    		String key = (String) types.keySet().toArray()[j];
+			    		String key = keys.next();
 			    		ContextType type = types.get(key);
 			    		if(true)
 			    		{
