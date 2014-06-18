@@ -63,6 +63,7 @@ public class DiscoveryService extends Service
 	@Override
 	public void onDestroy()
 	{
+        Log.e(TAG, "on destroy on the Dicovery Service is called...");
 	    tearDown();
 		super.onDestroy();
 		Log.d(TAG, "Stop... Destroy!");
@@ -70,13 +71,11 @@ public class DiscoveryService extends Service
 	
 	public void registerService(final int port)
 	{
-		/**Log.e(TAG, "REGISTER STARTS");
+		Log.d(TAG, "REGISTER STARTS");
         final Context ctx = this;
-        Thread tt = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
+        //TODO: There is  a bug in the newes Android Versions that makes using this imposible. Has not been fixed from 4.2.2 to 4.3 so it seems to be low priority for the android team
+        //https://code.google.com/p/android/issues/detail?id=35585
+/**
                 // Create the NsdServiceInfo object, and populate it.
                 NsdServiceInfo serviceInfo  = new NsdServiceInfo();
 
@@ -92,15 +91,13 @@ public class DiscoveryService extends Service
                 mNsdManager = (NsdManager) ctx.getSystemService(Context.NSD_SERVICE);
 
                 mNsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
-            }
-        });
-        tt.start();**/
-	    Log.e(TAG, "REGISTER DONE... WHAT NOW?");
+	    Log.d(TAG, "REGISTER DONE... WHAT NOW?");
+ **/
 	}
 	
 	public int getAvaliablePort() 
 	{
-		Log.e(TAG, "I AM SEARCHING FOR AN AVALIABLE PORT");
+		Log.d(TAG, "I AM SEARCHING FOR AN AVALIABLE PORT");
 		int mLocalPort=8889;
 	    // Initialize a server socket on the next available port.
 	    try 
@@ -112,10 +109,10 @@ public class DiscoveryService extends Service
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
-	    Log.e(TAG, "THE CHOSEN PORT IS");
+	    Log.d(TAG, "THE CHOSEN PORT IS");
 	    // Store the chosen port.
 	    mLocalPort = mServerSocket.getLocalPort();
-	    Log.e(TAG, "->"+mLocalPort);
+	    Log.d(TAG, "->"+mLocalPort);
 	    return mLocalPort;
 	}
 	
@@ -127,7 +124,7 @@ public class DiscoveryService extends Service
 	        @Override
 	        public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) 
 	        {
-	        	Log.e(TAG, "ON NSD SERVICE REGISTERED");
+	        	Log.d(TAG, "ON NSD SERVICE REGISTERED");
 	            // Save the service name.  Android may have changed it in order to
 	            // resolve a conflict, so update the name you initially requested
 	            // with the name Android actually used.
@@ -137,6 +134,7 @@ public class DiscoveryService extends Service
 	        @Override
 	        public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) 
 	        {
+                Log.e(TAG, "onRegistrationFailed...");
 	            // Registration failed!  Put debugging code here to determine why.
 	        }
 
@@ -158,6 +156,9 @@ public class DiscoveryService extends Service
 	 // NsdHelper's tearDown method
     public static void tearDown() 
     {
-    	mNsdManager.unregisterService(mRegistrationListener);
+        if(mNsdManager!=null)
+        {
+            mNsdManager.unregisterService(mRegistrationListener);
+        }
     }
 }

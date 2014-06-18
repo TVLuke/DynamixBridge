@@ -44,20 +44,13 @@ public class ObservableDynamixWebservice extends ObservableWebservice<ContextEve
 {
 	private static String TAG ="SSPBridge";
 	private ContextType contexttype;
-	private int updateintervall=10000;
-    private int weakEtag;
+    private byte[] weakEtag;
 	
-	public ObservableDynamixWebservice(ContextType contexttype, int updateintervall)
+	public ObservableDynamixWebservice(ContextType contexttype)
 	{
-		super("/"+contexttype.getName().replace(".", "/"), contexttype.getCurrentEvent(), updateintervall/1000);
+		super("/" + contexttype.getName().replace(".", "/"), contexttype.getCurrentEvent());
 		Log.d(TAG, "constructor line 2");
-		this.updateintervall=updateintervall;
 		Log.d(TAG, "constructor line 3");
-		int age = updateintervall/1000;
-		if(age<1)
-		{
-			age=1;
-		}
 		this.contexttype=contexttype;
 		contexttype.registerForUpdates(this);
 		Log.d(TAG, "new Service has been established for "+contexttype.getName());
@@ -81,7 +74,7 @@ public class ObservableDynamixWebservice extends ObservableWebservice<ContextEve
     @Override
     public byte[] getEtag(long contentFormat)
     {
-        return Ints.toByteArray(weakEtag & Longs.hashCode(contentFormat));
+        return weakEtag;
     }
 
     private void schedulePeriodicResourceUpdate()
@@ -93,10 +86,10 @@ public class ObservableDynamixWebservice extends ObservableWebservice<ContextEve
             @Override
             public void run() 
             {
-                setResourceStatus(contexttype.getCurrentEvent(), (updateintervall/1000));
+                setResourceStatus(contexttype.getCurrentEvent(), (contexttype.getUpdateIntervall()));
                 Log.d(TAG, "New status of resource " + getPath() + ": " + getResourceStatus().getContextType());
             }
-        },0, updateintervall, TimeUnit.MILLISECONDS);
+        },0, contexttype.getUpdateIntervall(), TimeUnit.MILLISECONDS);
     }
 	
 	@Override
@@ -301,6 +294,7 @@ public class ObservableDynamixWebservice extends ObservableWebservice<ContextEve
             etag[2]= 1;
             etag[3]= 1;
         }
+        weakEtag = etag;
 	}
 
 

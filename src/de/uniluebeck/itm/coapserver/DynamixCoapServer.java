@@ -66,8 +66,7 @@ public class DynamixCoapServer extends CoapServerApplication
 
     public void refreshRootService() 
     {
-        //The API seems to have changed and this next line is no longer allowed...
-        //this.
+        //TODO: The API seems to have changed and removeSerivice is no longer allowed...
         registerService(new WellKnownCoreResource(getRegisteredServices()));
     }
 
@@ -76,5 +75,4 @@ public class DynamixCoapServer extends CoapServerApplication
         //why does a server application not have any method to return the port...?
 		return Constants.COAP_PORT;
 	}
-
 }

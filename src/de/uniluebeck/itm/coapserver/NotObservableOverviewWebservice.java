@@ -54,7 +54,6 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
     	Log.d(TAG, "Path:"+ this.getPath());
     }
 
-    //TODO: this should be PUT!
 	private void processPut(SettableFuture<CoapResponse> responseFuture, CoapRequest request) throws InvalidOptionException, InvalidMessageException, InvalidHeaderException 
 	{
         CoapResponse response;
@@ -192,7 +191,6 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 	            try {
 					responseFuture.set(new CoapResponse(request.getMessageTypeName(), MessageCode.Name.INTERNAL_SERVER_ERROR_500));
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 	        }
@@ -202,7 +200,7 @@ public class NotObservableOverviewWebservice extends NotObservableWebservice<Str
 	@Override
 	public void shutdown() 
 	{
-		// TODO Auto-generated method stub
+
 		
 	}
 

@@ -16,15 +16,11 @@
 
 package de.uniluebeck.itm.coapserver;
 
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 import de.uniluebeck.itm.dynamixsspbridge.dynamix.ContextType;
-import de.uniluebeck.itm.dynamixsspbridge.support.Constants;
 import de.uniluebeck.itm.ncoap.application.server.webservice.Webservice;
 import android.app.Service;
 import android.content.Intent;
@@ -147,7 +143,7 @@ public class CoapServerManager extends Service
 				{
 					Log.d(TAG, "next line0");
 					Log.d(TAG, ""+s.getServerPort());
-					ObservableDynamixWebservice ods = new ObservableDynamixWebservice(contexttype, updateintervall);
+					ObservableDynamixWebservice ods = new ObservableDynamixWebservice(contexttype);
 					Log.d(TAG, "next lineb");
 					if(ods!=null)
 					{
@@ -159,7 +155,7 @@ public class CoapServerManager extends Service
 						if(!contexttype.getName().endsWith(".man"))
 						{
 							Log.d(TAG, "in the if");
-							s.registerService(new NotObservableDynamixWebservice(contexttype.getManType()));
+							s.registerService(new ObservableDynamixWebservice(contexttype.getManType()));
 							Log.d(TAG, "still");
 							contexttype.getManType().activate(s.getServerPort(), updateintervall);
 						}

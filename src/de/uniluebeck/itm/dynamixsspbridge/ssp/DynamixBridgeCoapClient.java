@@ -42,7 +42,6 @@ public class DynamixBridgeCoapClient extends Service
 	@Override
 	public IBinder onBind(Intent arg0) 
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -55,6 +54,7 @@ public class DynamixBridgeCoapClient extends Service
 		{
 			try
 			{
+                //TODO: using InetSocketAdress and URI seems strange... probably this isn't right.
 				CoapClientApplication client = new CoapClientApplication();
 				URI targetURI = new URI ("coap://"+sspIP+"/here_i_am");
                 InetSocketAddress isa = new InetSocketAddress("coap://"+sspIP+"/here_i_am", sspPort);

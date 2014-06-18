@@ -22,7 +22,6 @@ import java.util.Date;
 import org.ambientdynamix.api.application.ContextEvent;
 
 
-import de.uniluebeck.itm.coapserver.NotObservableDynamixWebservice;
 import de.uniluebeck.itm.coapserver.ObservableDynamixWebservice;
 import de.uniluebeck.itm.dynamixsspbridge.accesscontrol.Tolken;
 import de.uniluebeck.itm.dynamixsspbridge.core.ManagerManager;
@@ -44,7 +43,7 @@ public class ContextType
 	private ContextEvent currentEvent=null;
 	private ContextEvent previousEvent=null;
 	private ArrayList<ObservableDynamixWebservice> observableservices = new ArrayList<ObservableDynamixWebservice>();
-	private ArrayList<NotObservableDynamixWebservice> notobservableservices = new ArrayList<NotObservableDynamixWebservice>();
+	private ArrayList<ObservableDynamixWebservice> notobservableservices = new ArrayList<ObservableDynamixWebservice>();
 	private ArrayList<HTTPDynamixControler> httpContextTypeControler = new ArrayList<HTTPDynamixControler>();
 	private ContextType manType;
 	private int updateIntervall=10000;
@@ -153,15 +152,6 @@ public class ContextType
 		else
 		{
 			Log.e(TAG, "The service is null, this makes no sense.");
-		}
-	}
-	
-	public void registerForUpdates(	NotObservableDynamixWebservice service) 
-	{
-		notobservableservices.add(service);
-		if(currentEvent!=null)
-		{
-			service.setResourceStatus(currentEvent, 10);
 		}
 	}
 	
