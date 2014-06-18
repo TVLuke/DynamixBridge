@@ -11,26 +11,12 @@
     
     <repositories>
 	    <repository>
-	        <id>itm-maven-repository-releases-site</id>
-			<url>https://maven.itm.uni-luebeck.de/content/repositories/releases/</url>
-			<snapshots>
-			    <enabled>true</enabled>
-			</snapshots>
-	    </repository>
-	              <repository>
-                <id>itm-maven-repository-snapshots-site</id>
-                <url>https://maven.itm.uni-luebeck.de/content/repositories/snapshots/</url>
-                 <releases>
-		            <enabled>false</enabled>
-		            <updatePolicy>always</updatePolicy>
-		            <checksumPolicy>warn</checksumPolicy>
-		          </releases>
-              	<snapshots>
-                	<enabled>true</enabled>
-                	<updatePolicy>always</updatePolicy>
-                	<checksumPolicy>ignore</checksumPolicy>
-            	</snapshots>
-            </repository>
+            <id>itm-maven-repository-snapshot-site</id>
+            <url>https://maven.itm.uni-luebeck.de/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 	</repositories> 
 
     <dependencies>
@@ -56,7 +42,7 @@
 		</dependency>
 	    <dependency>
 	        <groupId>de.uniluebeck.itm</groupId>
-	        <artifactId>ncoap</artifactId>
+	        <artifactId>ncoap-core</artifactId>
 	        <version>1.8.0-SNAPSHOT</version>
 	        	<exclusions>
 		            <exclusion>
@@ -124,13 +110,6 @@
 		    <version>0.8</version>
 		    <scope>system</scope>
 		    <systemPath>${project.basedir}/lib/iri-0.8.jar</systemPath>
-		</dependency>
-		<dependency>
-		    <groupId>icu4j</groupId>
-		    <artifactId>icu4j</artifactId>
-		    <version>3.4.5</version>
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/lib/icu4j-3.4.5.jar</systemPath>
 		</dependency>
 		<dependency>
 		    <groupId>icu4j</groupId>
